@@ -1,0 +1,99 @@
+{
+    "workspace": {
+        "slug": "mash-burn-co",
+        "name": "Mash & Burn Co."
+    },
+    "site": {
+        "title": "Mash & Burn Co.",
+        "tagline": "Unnecessarily well-made",
+        "description": "Well-made projects, bench notes, and field-tested clothing.",
+        "canonicalUrl": "https://mashandburnco.com",
+        "logo": null,
+        "favicon": null,
+        "locale": "en-US",
+        "timezone": "America/New_York",
+        "contactEmail": "hello@mashandburnco.com",
+        "social": {
+            "instagram": "https://www.instagram.com/mashandburnco/",
+            "facebook": "https://www.facebook.com/jaredmashburn",
+            "pinterest": "https://www.pinterest.com/mashandburnco/",
+            "youtube": "https://www.youtube.com/@mashandburnco"
+        },
+        "seo": {
+            "title": null,
+            "titleTemplate": "%s | Mash & Burn Co.",
+            "description": "Unnecessarily well-made projects, bench notes, and field-tested clothing from a small Raleigh workshop.",
+            "keywords": [
+                "handmade",
+                "workshop",
+                "raleigh",
+                "menswear",
+                "denim",
+                "bench notes"
+            ],
+            "robots": "index,follow",
+            "image": "mb-monogram",
+            "imageAlt": "Mash & Burn Co. monogram",
+            "ogType": "website",
+            "siteName": "Mash & Burn Co.",
+            "twitterCard": "summary_large_image",
+            "twitterHandle": "@mashandburnco",
+            "twitterCreator": null,
+            "fbAppId": null,
+            "themeColor": "#2b2b2b",
+            "publisher": "Mash & Burn Co.",
+            "verification": {
+                "google": null,
+                "bing": null,
+                "pinterest": "demo-pinterest-token",
+                "yandex": null
+            }
+        },
+        "metadataJson": {
+            "brand": {
+                "logo": "mb-monogram",
+                "favicon": "mb-favicon",
+                "seal": "maker-stamp-round",
+                "hangTag": "hang-tag",
+                "paperGrain": "paper-grain",
+                "paperLaidLines": "paper-laid-lines",
+                "paperArchival": "paper-archival",
+                "paperBase": "paper-base",
+                "paperChalkSmudge": "paper-chalk-smudge",
+                "paperFold": "paper-fold",
+                "paperPatternGrid": "paper-pattern-grid",
+                "makerStampBlank": "maker-stamp-blank",
+                "makersMark": "makers-mark",
+                "labelMark": "label-mark",
+                "runningStitch": "running-stitch",
+                "paperPinHole": "paper-pin-hole",
+                "threadSpool": "thread-spool"
+            },
+            "seo": {
+                "titleTemplate": "%s | Mash & Burn Co.",
+                "description": "Unnecessarily well-made projects, bench notes, and field-tested clothing from a small Raleigh workshop.",
+                "keywords": [
+                    "handmade",
+                    "workshop",
+                    "raleigh",
+                    "menswear",
+                    "denim",
+                    "bench notes"
+                ],
+                "robots": "index,follow",
+                "image": "mb-monogram",
+                "imageAlt": "Mash & Burn Co. monogram",
+                "ogType": "website",
+                "siteName": "Mash & Burn Co.",
+                "twitterCard": "summary_large_image",
+                "twitterHandle": "@mashandburnco",
+                "themeColor": "#2b2b2b",
+                "publisher": "Mash & Burn Co.",
+                "verification": {
+                    "pinterest": "demo-pinterest-token"
+                }
+            },
+            "imprint": "An iWobble Labs Project"
+        }
+    }
+}

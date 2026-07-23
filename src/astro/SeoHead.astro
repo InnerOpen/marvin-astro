@@ -1,0 +1,73 @@
+---
+import type { ApiSeo } from '../types.js';
+
+type Props = {
+  seo: ApiSeo;
+  /** Per-page overrides. When omitted, the site-level SEO values are used. */
+  pageTitle?: string;
+  pageDescription?: string;
+  pageImage?: string;
+  pageType?: string;
+  noindex?: boolean;
+};
+
+const { seo, pageTitle, pageDescription, pageImage, pageType, noindex } = Astro.props;
+
+// Title: when a page sets a title, apply the site's title_template if one exists (%s = page
+// title), otherwise use the page title verbatim. Pages with no title fall back to the site title.
+const title = pageTitle
+  ? seo.titleTemplate
+    ? seo.titleTemplate.replace('%s', pageTitle)
+    : pageTitle
+  : seo.title;
+
+const description = pageDescription ?? seo.description;
+const image = pageImage ?? seo.image;
+const ogType = pageType ?? seo.ogType;
+const robots = noindex ? 'noindex,nofollow' : seo.robots;
+
+// Canonical + absolute image URL, resolved against the current request when a base is known.
+const canonicalBase = seo.canonicalUrl?.replace(/\/$/, '');
+const canonical = canonicalBase
+  ? `${canonicalBase}${Astro.url.pathname}`
+  : Astro.url.href;
+const absoluteImage = image
+  ? /^https?:\/\//.test(image)
+    ? image
+    : canonicalBase
+      ? `${canonicalBase}${image.startsWith('/') ? '' : '/'}${image}`
+      : image
+  : undefined;
+
+const verification = seo.verification ?? {};
+---
+<title>{title}</title>
+<meta name="description" content={description} />
+<meta name="robots" content={robots} />
+{seo.keywords.length > 0 && <meta name="keywords" content={seo.keywords.join(', ')} />}
+{seo.themeColor && <meta name="theme-color" content={seo.themeColor} />}
+<link rel="canonical" href={canonical} />
+
+{/* Open Graph */}
+<meta property="og:type" content={ogType} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:site_name" content={seo.siteName} />
+{absoluteImage && <meta property="og:image" content={absoluteImage} />}
+{absoluteImage && seo.imageAlt && <meta property="og:image:alt" content={seo.imageAlt} />}
+{seo.fbAppId && <meta property="fb:app_id" content={seo.fbAppId} />}
+
+{/* Twitter / X */}
+<meta name="twitter:card" content={seo.twitterCard} />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+{absoluteImage && <meta name="twitter:image" content={absoluteImage} />}
+{seo.twitterHandle && <meta name="twitter:site" content={seo.twitterHandle} />}
+{seo.twitterCreator && <meta name="twitter:creator" content={seo.twitterCreator} />}
+
+{/* Search-engine ownership verification */}
+{verification.google && <meta name="google-site-verification" content={verification.google} />}
+{verification.bing && <meta name="msvalidate.01" content={verification.bing} />}
+{verification.pinterest && <meta name="p:domain_verify" content={verification.pinterest} />}
+{verification.yandex && <meta name="yandex-verification" content={verification.yandex} />}

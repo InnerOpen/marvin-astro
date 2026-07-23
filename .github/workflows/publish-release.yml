@@ -1,0 +1,21 @@
+name: Publish Release to inneropen.io
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish-to-io:
+    uses: InnerOpen/inneropen.io/.github/workflows/project-update.yml@main
+    with:
+      project: marvin-astro
+      work-area: marvin-cms
+      version: ${{ github.event.release.tag_name }}
+      headline: "Marvin Astro ${{ github.event.release.tag_name }} Released"
+      summary: ${{ github.event.release.body }}
+      type: release
+      maturity: experimental
+      repository: ${{ github.event.repository.html_url }}
+      release-url: ${{ github.event.release.html_url }}
+    secrets:
+      PUBLISHING_TOKEN: ${{ secrets.INNEROPEN_IO_TOKEN }}

@@ -1,0 +1,542 @@
+{
+    "slug": "workshop-reference",
+    "name": "Workshop Reference",
+    "description": "Reference material, techniques, sizing, materials, and workshop knowledge.",
+    "isSmart": true,
+    "smartRules": {
+        "entry_types": [
+            "workshop-reference"
+        ],
+        "statuses": [
+            "published"
+        ]
+    },
+    "metadataJson": null,
+    "entryCount": 9,
+    "entries": [
+        {
+            "slug": "faq",
+            "title": "FAQ",
+            "entryType": "workshop-reference",
+            "entryTypeInfo": {
+                "slug": "workshop-reference",
+                "renderer": null,
+                "package": null,
+                "version": null,
+                "config": null,
+                "publishable": true,
+                "submittable": false,
+                "routable": true
+            },
+            "summary": "Common questions from the workshop.",
+            "publishedAt": "2026-07-16T02:02:45.246149Z",
+            "status": "published",
+            "collections": [
+                {
+                    "role": null,
+                    "position": 0,
+                    "metadataJson": null,
+                    "collection": {
+                        "slug": "workshop-reference",
+                        "name": "Workshop Reference",
+                        "description": "Reference material, techniques, sizing, materials, and workshop knowledge.",
+                        "metadataJson": null,
+                        "sortOrder": 600
+                    }
+                }
+            ],
+            "assetSlugs": [
+                "envelope"
+            ],
+            "resourceSlugs": [],
+            "tags": [],
+            "metadataJson": null,
+            "featuredAsset": {
+                "slug": "envelope",
+                "name": "Envelope",
+                "mimeType": "image/svg+xml",
+                "assetType": "svg",
+                "fileSize": 401,
+                "width": null,
+                "height": null,
+                "altText": null,
+                "description": null,
+                "publicUrl": "http://localhost:8080/assets/mash-burn-co/assets/2026/07/62735973-57a8-4ff8-808d-ff3d9827a11f-envelope.svg",
+                "metadataJson": null,
+                "tags": [
+                    "site-asset"
+                ]
+            },
+            "order": 0
+        },
+        {
+            "slug": "shipping",
+            "title": "Shipping",
+            "entryType": "workshop-reference",
+            "entryTypeInfo": {
+                "slug": "workshop-reference",
+                "renderer": null,
+                "package": null,
+                "version": null,
+                "config": null,
+                "publishable": true,
+                "submittable": false,
+                "routable": true
+            },
+            "summary": "Details regarding shipping methods, expected delivery times, packaging standards, and order processing procedures.",
+            "publishedAt": "2026-07-13T21:59:42.898679Z",
+            "status": "published",
+            "collections": [
+                {
+                    "role": null,
+                    "position": 0,
+                    "metadataJson": null,
+                    "collection": {
+                        "slug": "workshop-reference",
+                        "name": "Workshop Reference",
+                        "description": "Reference material, techniques, sizing, materials, and workshop knowledge.",
+                        "metadataJson": null,
+                        "sortOrder": 600
+                    }
+                }
+            ],
+            "assetSlugs": [
+                "shipping-box"
+            ],
+            "resourceSlugs": [],
+            "tags": [],
+            "metadataJson": null,
+            "featuredAsset": {
+                "slug": "shipping-box",
+                "name": "Shipping Box",
+                "mimeType": "image/svg+xml",
+                "assetType": "svg",
+                "fileSize": 631,
+                "width": null,
+                "height": null,
+                "altText": null,
+                "description": null,
+                "publicUrl": "http://localhost:8080/assets/mash-burn-co/assets/2026/07/4515f3b7-4d36-4ef5-8c70-9a4d7b61de01-shipping-box.svg",
+                "metadataJson": null,
+                "tags": [
+                    "site-asset"
+                ]
+            },
+            "order": 0
+        },
+        {
+            "slug": "terms",
+            "title": "Terms",
+            "entryType": "workshop-reference",
+            "entryTypeInfo": {
+                "slug": "workshop-reference",
+                "renderer": null,
+                "package": null,
+                "version": null,
+                "config": null,
+                "publishable": true,
+                "submittable": false,
+                "routable": true
+            },
+            "summary": "The basic terms for using this site and working with Mash & Burn Co.",
+            "publishedAt": "2026-07-13T21:55:48.716257Z",
+            "status": "published",
+            "collections": [
+                {
+                    "role": null,
+                    "position": 0,
+                    "metadataJson": null,
+                    "collection": {
+                        "slug": "workshop-reference",
+                        "name": "Workshop Reference",
+                        "description": "Reference material, techniques, sizing, materials, and workshop knowledge.",
+                        "metadataJson": null,
+                        "sortOrder": 600
+                    }
+                },
+                {
+                    "role": "legal",
+                    "position": 1,
+                    "metadataJson": null,
+                    "collection": {
+                        "slug": "footer-navigation",
+                        "name": "Footer Navigation",
+                        "description": "Ordered entries used for footer navigation and secondary site links.",
+                        "metadataJson": null,
+                        "sortOrder": 300
+                    }
+                }
+            ],
+            "assetSlugs": [
+                "thimble"
+            ],
+            "resourceSlugs": [],
+            "tags": [],
+            "metadataJson": {
+                "order": 5
+            },
+            "featuredAsset": {
+                "slug": "thimble",
+                "name": "Thimble",
+                "mimeType": "image/svg+xml",
+                "assetType": "svg",
+                "fileSize": 840,
+                "width": null,
+                "height": null,
+                "altText": null,
+                "description": null,
+                "publicUrl": "http://localhost:8080/assets/mash-burn-co/assets/2026/07/829c3cf5-2b43-431e-bdf9-b36c3528c601-thimble.svg",
+                "metadataJson": null,
+                "tags": [
+                    "site-asset"
+                ]
+            },
+            "order": 0
+        },
+        {
+            "slug": "returns-repairs",
+            "title": "Returns & Repairs",
+            "entryType": "workshop-reference",
+            "entryTypeInfo": {
+                "slug": "workshop-reference",
+                "renderer": null,
+                "package": null,
+                "version": null,
+                "config": null,
+                "publishable": true,
+                "submittable": false,
+                "routable": true
+            },
+            "summary": "What to do if a piece is not quite right.",
+            "publishedAt": "2026-07-13T01:56:21.704996Z",
+            "status": "published",
+            "collections": [
+                {
+                    "role": null,
+                    "position": 0,
+                    "metadataJson": null,
+                    "collection": {
+                        "slug": "workshop-reference",
+                        "name": "Workshop Reference",
+                        "description": "Reference material, techniques, sizing, materials, and workshop knowledge.",
+                        "metadataJson": null,
+                        "sortOrder": 600
+                    }
+                }
+            ],
+            "assetSlugs": [
+                "hang-tag"
+            ],
+            "resourceSlugs": [],
+            "tags": [],
+            "metadataJson": null,
+            "featuredAsset": {
+                "slug": "hang-tag",
+                "name": "Hang Tag",
+                "mimeType": "image/svg+xml",
+                "assetType": "svg",
+                "fileSize": 584,
+                "width": null,
+                "height": null,
+                "altText": null,
+                "description": null,
+                "publicUrl": "http://localhost:8080/assets/mash-burn-co/assets/2026/07/c3e4532e-b7e8-4240-9cf7-836938b0072a-hang-tag.svg",
+                "metadataJson": null,
+                "tags": [
+                    "site-asset"
+                ]
+            },
+            "order": 0
+        },
+        {
+            "slug": "privacy",
+            "title": "Privacy",
+            "entryType": "workshop-reference",
+            "entryTypeInfo": {
+                "slug": "workshop-reference",
+                "renderer": null,
+                "package": null,
+                "version": null,
+                "config": null,
+                "publishable": true,
+                "submittable": false,
+                "routable": true
+            },
+            "summary": "Privacy information for Mash & Burn Co., including what data may be collected and how it may be used.",
+            "publishedAt": "2026-07-13T00:25:04.319586Z",
+            "status": "published",
+            "collections": [
+                {
+                    "role": null,
+                    "position": 0,
+                    "metadataJson": null,
+                    "collection": {
+                        "slug": "workshop-reference",
+                        "name": "Workshop Reference",
+                        "description": "Reference material, techniques, sizing, materials, and workshop knowledge.",
+                        "metadataJson": null,
+                        "sortOrder": 600
+                    }
+                },
+                {
+                    "role": "legal",
+                    "position": 1,
+                    "metadataJson": null,
+                    "collection": {
+                        "slug": "footer-navigation",
+                        "name": "Footer Navigation",
+                        "description": "Ordered entries used for footer navigation and secondary site links.",
+                        "metadataJson": null,
+                        "sortOrder": 300
+                    }
+                }
+            ],
+            "assetSlugs": [
+                "label-mark"
+            ],
+            "resourceSlugs": [],
+            "tags": [],
+            "metadataJson": null,
+            "featuredAsset": {
+                "slug": "label-mark",
+                "name": "Label Mark",
+                "mimeType": "image/svg+xml",
+                "assetType": "svg",
+                "fileSize": 1380,
+                "width": null,
+                "height": null,
+                "altText": null,
+                "description": null,
+                "publicUrl": "http://localhost:8080/assets/mash-burn-co/assets/2026/07/f95f60b1-1529-4c36-a41e-0f0e4ef57bc1-label-mark.svg",
+                "metadataJson": null,
+                "tags": [
+                    "site-asset"
+                ]
+            },
+            "order": 0
+        },
+        {
+            "slug": "materials-sourcing",
+            "title": "Materials & Sourcing",
+            "entryType": "workshop-reference",
+            "entryTypeInfo": {
+                "slug": "workshop-reference",
+                "renderer": null,
+                "package": null,
+                "version": null,
+                "config": null,
+                "publishable": true,
+                "submittable": false,
+                "routable": true
+            },
+            "summary": "Notes on the fabrics, leather, hardware, and thread used in the workshop.",
+            "publishedAt": "2026-07-13T00:25:04.016723Z",
+            "status": "published",
+            "collections": [
+                {
+                    "role": null,
+                    "position": 0,
+                    "metadataJson": null,
+                    "collection": {
+                        "slug": "workshop-reference",
+                        "name": "Workshop Reference",
+                        "description": "Reference material, techniques, sizing, materials, and workshop knowledge.",
+                        "metadataJson": null,
+                        "sortOrder": 600
+                    }
+                }
+            ],
+            "assetSlugs": [
+                "thread-spool"
+            ],
+            "resourceSlugs": [],
+            "tags": [],
+            "metadataJson": null,
+            "featuredAsset": {
+                "slug": "thread-spool",
+                "name": "Thread Spool",
+                "mimeType": "image/svg+xml",
+                "assetType": "svg",
+                "fileSize": 1182,
+                "width": null,
+                "height": null,
+                "altText": null,
+                "description": null,
+                "publicUrl": "http://localhost:8080/assets/mash-burn-co/assets/2026/07/e7a6892a-7960-4417-8864-8674e934cc0f-thread-spool.svg",
+                "metadataJson": null,
+                "tags": [
+                    "site-asset"
+                ]
+            },
+            "order": 0
+        },
+        {
+            "slug": "care-guide",
+            "title": "Care Guide",
+            "entryType": "workshop-reference",
+            "entryTypeInfo": {
+                "slug": "workshop-reference",
+                "renderer": null,
+                "package": null,
+                "version": null,
+                "config": null,
+                "publishable": true,
+                "submittable": false,
+                "routable": true
+            },
+            "summary": "How to care for pieces built to wear in, not wear out.",
+            "publishedAt": "2026-07-13T00:25:03.948499Z",
+            "status": "published",
+            "collections": [
+                {
+                    "role": null,
+                    "position": 0,
+                    "metadataJson": null,
+                    "collection": {
+                        "slug": "workshop-reference",
+                        "name": "Workshop Reference",
+                        "description": "Reference material, techniques, sizing, materials, and workshop knowledge.",
+                        "metadataJson": null,
+                        "sortOrder": 600
+                    }
+                }
+            ],
+            "assetSlugs": [
+                "workshop-notebook"
+            ],
+            "resourceSlugs": [],
+            "tags": [],
+            "metadataJson": null,
+            "featuredAsset": {
+                "slug": "workshop-notebook",
+                "name": "Workshop Notebook",
+                "mimeType": "image/svg+xml",
+                "assetType": "svg",
+                "fileSize": 689,
+                "width": null,
+                "height": null,
+                "altText": null,
+                "description": null,
+                "publicUrl": "http://localhost:8080/assets/mash-burn-co/assets/2026/07/1b9d068d-68c7-445d-99a6-96b8f25797a4-workshop-notebook.svg",
+                "metadataJson": null,
+                "tags": [
+                    "site-asset"
+                ]
+            },
+            "order": 0
+        },
+        {
+            "slug": "sizing",
+            "title": "Sizing",
+            "entryType": "workshop-reference",
+            "entryTypeInfo": {
+                "slug": "workshop-reference",
+                "renderer": null,
+                "package": null,
+                "version": null,
+                "config": null,
+                "publishable": true,
+                "submittable": false,
+                "routable": true
+            },
+            "summary": "A practical note on fit, measurements, and choosing the right size.",
+            "publishedAt": "2026-07-13T00:25:03.891867Z",
+            "status": "published",
+            "collections": [
+                {
+                    "role": null,
+                    "position": 0,
+                    "metadataJson": null,
+                    "collection": {
+                        "slug": "workshop-reference",
+                        "name": "Workshop Reference",
+                        "description": "Reference material, techniques, sizing, materials, and workshop knowledge.",
+                        "metadataJson": null,
+                        "sortOrder": 600
+                    }
+                }
+            ],
+            "assetSlugs": [
+                "tailors-chalk"
+            ],
+            "resourceSlugs": [],
+            "tags": [],
+            "metadataJson": null,
+            "featuredAsset": {
+                "slug": "tailors-chalk",
+                "name": "Tailors Chalk",
+                "mimeType": "image/svg+xml",
+                "assetType": "svg",
+                "fileSize": 608,
+                "width": null,
+                "height": null,
+                "altText": null,
+                "description": null,
+                "publicUrl": "http://localhost:8080/assets/mash-burn-co/assets/2026/07/b8d50bf7-6db8-4d29-aa29-91e384ad5e19-tailors-chalk.svg",
+                "metadataJson": null,
+                "tags": [
+                    "site-asset"
+                ]
+            },
+            "order": 0
+        },
+        {
+            "slug": "project-inquiries",
+            "title": "Project Inquiries",
+            "entryType": "workshop-reference",
+            "entryTypeInfo": {
+                "slug": "workshop-reference",
+                "renderer": null,
+                "package": null,
+                "version": null,
+                "config": null,
+                "publishable": true,
+                "submittable": false,
+                "routable": true
+            },
+            "summary": "How custom and one-off workshop projects begin.",
+            "publishedAt": "2026-07-13T00:25:03.833795Z",
+            "status": "published",
+            "collections": [
+                {
+                    "role": null,
+                    "position": 0,
+                    "metadataJson": null,
+                    "collection": {
+                        "slug": "workshop-reference",
+                        "name": "Workshop Reference",
+                        "description": "Reference material, techniques, sizing, materials, and workshop knowledge.",
+                        "metadataJson": null,
+                        "sortOrder": 600
+                    }
+                }
+            ],
+            "assetSlugs": [
+                "tailors-scissors"
+            ],
+            "resourceSlugs": [],
+            "tags": [],
+            "metadataJson": {
+                "component": "ProjectInquiryForm",
+                "componentPlacement": "afterContent"
+            },
+            "featuredAsset": {
+                "slug": "tailors-scissors",
+                "name": "Tailors Scissors",
+                "mimeType": "image/svg+xml",
+                "assetType": "svg",
+                "fileSize": 1154,
+                "width": null,
+                "height": null,
+                "altText": null,
+                "description": null,
+                "publicUrl": "http://localhost:8080/assets/mash-burn-co/assets/2026/07/eaa61d3c-89ba-4873-bd7a-f81187c8fa3a-tailors-scissors.svg",
+                "metadataJson": null,
+                "tags": [
+                    "site-asset"
+                ]
+            },
+            "order": 0
+        }
+    ]
+}

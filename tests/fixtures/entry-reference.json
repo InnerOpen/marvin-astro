@@ -1,0 +1,63 @@
+{
+    "slug": "faq",
+    "title": "FAQ",
+    "entryType": "workshop-reference",
+    "entryTypeInfo": {
+        "slug": "workshop-reference",
+        "renderer": null,
+        "package": null,
+        "version": null,
+        "config": null,
+        "publishable": true,
+        "submittable": false,
+        "routable": true
+    },
+    "summary": "Common questions from the workshop.",
+    "description": "Frequently asked questions about Mash & Burn Co., including ordering, sizing, care, custom work, and workshop process.",
+    "data": {
+        "body": "## Do You Release Collections?\r\n\r\nNo. I release projects when they are ready.\r\n\r\n## Is Everything Made By Hand?\r\n\r\nEverything is cut, sewn, finished, packed, or handled by me in small batches.\r\n\r\n## Do You Take Custom Work?\r\n\r\nSometimes. Bespoke work depends on timing, fit, and whether the project belongs in the workshop.\r\n\r\n## Can I Visit The Workshop?\r\n\r\nNot currently. The workshop is private, but the work is documented through projects and Bench Notes.\r\n\r\n## How Do I Know What Is Available?\r\n\r\nCheck Current Work and On The Bench. If something is available, it will say so.",
+        "order": 7
+    },
+    "publishedAt": "2026-07-16T02:02:45.246149Z",
+    "metadataJson": null,
+    "collections": [
+        {
+            "role": null,
+            "position": 0,
+            "metadataJson": null,
+            "collection": {
+                "slug": "workshop-reference",
+                "name": "Workshop Reference",
+                "description": "Reference material, techniques, sizing, materials, and workshop knowledge.",
+                "metadataJson": null,
+                "sortOrder": 600
+            }
+        }
+    ],
+    "resources": [],
+    "assets": [
+        {
+            "role": "icon",
+            "position": 0,
+            "metadataJson": null,
+            "asset": {
+                "slug": "envelope",
+                "name": "Envelope",
+                "mimeType": "image/svg+xml",
+                "assetType": "svg",
+                "fileSize": 401,
+                "width": null,
+                "height": null,
+                "altText": null,
+                "description": null,
+                "publicUrl": "http://localhost:8080/assets/mash-burn-co/assets/2026/07/62735973-57a8-4ff8-808d-ff3d9827a11f-envelope.svg",
+                "metadataJson": null,
+                "tags": [
+                    "site-asset"
+                ]
+            }
+        }
+    ],
+    "tags": [],
+    "order": null
+}

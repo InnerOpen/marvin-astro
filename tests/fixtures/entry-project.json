@@ -1,0 +1,288 @@
+{
+    "slug": "chore-coat",
+    "title": "Chore Coat",
+    "entryType": "project",
+    "entryTypeInfo": {
+        "slug": "project",
+        "renderer": null,
+        "package": null,
+        "version": null,
+        "config": null,
+        "publishable": true,
+        "submittable": false,
+        "routable": true
+    },
+    "summary": "A simple outer layer for shop days, errands, and honest abuse.",
+    "description": "A utility coat cut for movement and hard daily wear.",
+    "data": {
+        "projectNumber": "Project 005",
+        "category": "Jackets",
+        "material": "Herringbone Twill",
+        "projectStatus": "available",
+        "story": "The Chore Coat is the sort of piece I reach for when I do not want to think too hard about what I am wearing.\r\n\r\nThe shape is straightforward, the pockets are useful, and the fabric is chosen to take marks instead of pretending work is clean.\r\n\r\nIt is quiet by design. The kind of jacket that earns its keep slowly.",
+        "shortDescription": null,
+        "designIntent": "Build a daily outer layer that works hard without shouting.\r\nKeep the pocketing generous and the silhouette easy to live in.",
+        "workshopVerdict": "Built One at a Time.",
+        "buildStage": "Available",
+        "started": "Cutting Table",
+        "completed": null,
+        "leadTime": "Ready To Ship",
+        "madeIn": "Raleigh, NC",
+        "care": "Wash cold. Hang dry. Beat it up.",
+        "series": null,
+        "hours": null,
+        "tone": "olive"
+    },
+    "publishedAt": "2026-07-14T03:19:37.727811Z",
+    "metadataJson": {
+        "projectId": "project-005",
+        "projectNumber": "Project 005",
+        "category": "Jackets",
+        "material": "Herringbone Twill",
+        "projectStatus": "available",
+        "availability": "Available",
+        "workshopVerdict": "Built One at a Time.",
+        "started": "Cutting Table",
+        "buildStage": "Available",
+        "leadTime": "Ready To Ship",
+        "madeIn": "Raleigh, NC",
+        "care": "Wash cold. Hang dry. Beat it up.",
+        "details": [
+            {
+                "label": "Pockets",
+                "value": "Oversized Patch Pockets"
+            },
+            {
+                "label": "Construction",
+                "value": "Reinforced Stress Points"
+            },
+            {
+                "label": "Made In",
+                "value": "Raleigh, NC"
+            },
+            {
+                "label": "Lead Time",
+                "value": "Ready To Ship"
+            }
+        ],
+        "image": {
+            "alt": "Chore coat on a wooden workshop bench",
+            "tone": "olive"
+        }
+    },
+    "collections": [
+        {
+            "role": null,
+            "position": 0,
+            "metadataJson": null,
+            "collection": {
+                "slug": "projects",
+                "name": "Projects",
+                "description": "A record of what  I build in the workshop.  Every project starts with an idea and ends with something worth keeping. Ya!",
+                "metadataJson": null,
+                "sortOrder": 400
+            }
+        }
+    ],
+    "resources": [
+        {
+            "role": "primary-material",
+            "position": 0,
+            "metadataJson": null,
+            "resource": {
+                "slug": "herringbone-twill",
+                "name": "Herringbone Twill",
+                "resourceType": "material",
+                "description": "Durable herringbone twill fabric for outerwear and work coats.",
+                "url": null,
+                "externalId": null,
+                "metadataJson": null,
+                "entries": [],
+                "tags": []
+            }
+        },
+        {
+            "role": "component",
+            "position": 3,
+            "metadataJson": null,
+            "resource": {
+                "slug": "cotton-binding",
+                "name": "Cotton Binding",
+                "resourceType": "material",
+                "description": "Cotton binding tape for seam finishing and edge binding.",
+                "url": null,
+                "externalId": null,
+                "metadataJson": null,
+                "entries": [],
+                "tags": []
+            }
+        },
+        {
+            "role": "component",
+            "position": 1,
+            "metadataJson": null,
+            "resource": {
+                "slug": "reinforced-patch-pockets",
+                "name": "Reinforced Patch Pockets",
+                "resourceType": "construction",
+                "description": "Oversized patch pockets with reinforced corners and bar tacks.",
+                "url": null,
+                "externalId": null,
+                "metadataJson": null,
+                "entries": [],
+                "tags": []
+            }
+        },
+        {
+            "role": "component",
+            "position": 2,
+            "metadataJson": null,
+            "resource": {
+                "slug": "bar-tacked-stress-points",
+                "name": "Bar-Tacked Stress Points",
+                "resourceType": "construction",
+                "description": "Bar-tack reinforcement at all high-stress junctions.",
+                "url": null,
+                "externalId": null,
+                "metadataJson": null,
+                "entries": [],
+                "tags": []
+            }
+        }
+    ],
+    "assets": [
+        {
+            "role": "support",
+            "position": 1,
+            "metadataJson": null,
+            "asset": {
+                "slug": "stockcake-vintage-sewing-craft-3977238-small",
+                "name": "StockCake Vintage Sewing Craft 3977238 Small",
+                "mimeType": "image/jpeg",
+                "assetType": "image",
+                "fileSize": 21421,
+                "width": 256,
+                "height": 256,
+                "altText": null,
+                "description": null,
+                "publicUrl": "http://localhost:8080/assets/mash-burn-co/assets/2026/07/2af205e8-5e71-4b2a-bf52-455459327c99-stockcake-vintage_sewing_craft-3977238-small.jpg",
+                "metadataJson": null,
+                "tags": []
+            }
+        },
+        {
+            "role": "support",
+            "position": 2,
+            "metadataJson": null,
+            "asset": {
+                "slug": "stockcake-denim-jeans-closeup-997262-small",
+                "name": "StockCake Denim Jeans Closeup 997262 Small",
+                "mimeType": "image/jpeg",
+                "assetType": "image",
+                "fileSize": 25161,
+                "width": 256,
+                "height": 256,
+                "altText": null,
+                "description": null,
+                "publicUrl": "http://localhost:8080/assets/mash-burn-co/assets/2026/07/89bd6154-7723-4cbc-926b-622fac6c365d-stockcake-denim_jeans_closeup-997262-small.jpg",
+                "metadataJson": null,
+                "tags": []
+            }
+        },
+        {
+            "role": "support",
+            "position": 3,
+            "metadataJson": null,
+            "asset": {
+                "slug": "stockcake-vintage-denim-details-4015766-small",
+                "name": "StockCake Vintage Denim Details 4015766 Small",
+                "mimeType": "image/jpeg",
+                "assetType": "image",
+                "fileSize": 21015,
+                "width": 192,
+                "height": 336,
+                "altText": null,
+                "description": null,
+                "publicUrl": "http://localhost:8080/assets/mash-burn-co/assets/2026/07/826f1765-80d2-4388-b473-7e3eec11ab35-stockcake-vintage_denim_details-4015766-small.jpg",
+                "metadataJson": null,
+                "tags": []
+            }
+        },
+        {
+            "role": "hero-grade",
+            "position": 5,
+            "metadataJson": {
+                "derived_from": "4d4c0e4c-f0a9-4e11-95bc-d1cfd8ebbd6a",
+                "derivation": "grade:rustic-warm"
+            },
+            "asset": {
+                "slug": "lagrace--grade-rustic-warm",
+                "name": "Lagrace (grade rustic-warm)",
+                "mimeType": "image/jpeg",
+                "assetType": "image",
+                "fileSize": 83684,
+                "width": 720,
+                "height": 1080,
+                "altText": "Silhouette of a tall ship against a vibrant sunset by the ocean.",
+                "description": null,
+                "publicUrl": "http://localhost:8080/assets/mash-burn-co/assets/2026/07/581bdefd-7f22-402f-823e-1c1bc9faf719-lagrace-grade-rustic-warm.jpg",
+                "metadataJson": {
+                    "derived_from": "4d4c0e4c-f0a9-4e11-95bc-d1cfd8ebbd6a",
+                    "derivation": "grade:rustic-warm"
+                },
+                "tags": []
+            }
+        },
+        {
+            "role": "icon",
+            "position": 4,
+            "metadataJson": null,
+            "asset": {
+                "slug": "work-jacket",
+                "name": "Work Jacket",
+                "mimeType": "image/svg+xml",
+                "assetType": "svg",
+                "fileSize": 979,
+                "width": null,
+                "height": null,
+                "altText": null,
+                "description": null,
+                "publicUrl": "http://localhost:8080/assets/mash-burn-co/assets/2026/07/ee3cea7f-861d-46e1-9788-dffb75f8d111-work-jacket.svg",
+                "metadataJson": null,
+                "tags": [
+                    "site-asset"
+                ]
+            }
+        },
+        {
+            "role": "hero",
+            "position": 0,
+            "metadataJson": null,
+            "asset": {
+                "slug": "lagrace",
+                "name": "Lagrace",
+                "mimeType": "image/jpeg",
+                "assetType": "image",
+                "fileSize": 74451,
+                "width": 720,
+                "height": 1080,
+                "altText": "Silhouette of a tall ship against a vibrant sunset by the ocean.",
+                "description": "The image features a tall ship silhouetted against a breathtaking sunset. The sun is large and bright on the horizon, surrounded by warm hues of orange and yellow, casting a dramatic backdrop over the ocean.",
+                "publicUrl": "http://localhost:8080/assets/mash-burn-co/assets/2026/07/b3911b88-81a1-4db3-bf09-6a8dd2ae9a8d-lagrace.jpg",
+                "metadataJson": null,
+                "tags": []
+            }
+        }
+    ],
+    "tags": [
+        "chore-coat",
+        "workwear",
+        "durable-fabric",
+        "easy-care",
+        "casual-style",
+        "everyday-essentials",
+        "made-in-usa",
+        "versatile-outerwear"
+    ],
+    "order": null
+}

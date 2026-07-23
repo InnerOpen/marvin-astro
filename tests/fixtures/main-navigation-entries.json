@@ -1,0 +1,381 @@
+{
+    "slug": "main-navigation",
+    "name": "Main Navigation",
+    "description": "Ordered entries used for the main website navigation.",
+    "isSmart": false,
+    "smartRules": null,
+    "metadataJson": null,
+    "entryCount": 6,
+    "entries": [
+        {
+            "slug": "current-project-nav",
+            "title": "Current Project",
+            "entryType": "navigation-item",
+            "entryTypeInfo": {
+                "slug": "navigation-item",
+                "renderer": "navigation",
+                "package": "@inneropen/marvin-renderers-core",
+                "version": "^1.0.0",
+                "config": null,
+                "publishable": true,
+                "submittable": false,
+                "routable": false
+            },
+            "summary": "Links to the current project section on the homepage.",
+            "publishedAt": "2026-07-13T00:25:03.527289Z",
+            "status": "published",
+            "collections": [
+                {
+                    "role": null,
+                    "position": 0,
+                    "metadataJson": null,
+                    "collection": {
+                        "slug": "footer-navigation",
+                        "name": "Footer Navigation",
+                        "description": "Ordered entries used for footer navigation and secondary site links.",
+                        "metadataJson": null,
+                        "sortOrder": 300
+                    }
+                },
+                {
+                    "role": null,
+                    "position": 0,
+                    "metadataJson": null,
+                    "collection": {
+                        "slug": "main-navigation",
+                        "name": "Main Navigation",
+                        "description": "Ordered entries used for the main website navigation.",
+                        "metadataJson": null,
+                        "sortOrder": 200
+                    }
+                }
+            ],
+            "assetSlugs": [],
+            "resourceSlugs": [],
+            "tags": [],
+            "metadataJson": null,
+            "featuredAsset": null,
+            "order": 0
+        },
+        {
+            "slug": "projects",
+            "title": "Projects",
+            "entryType": "page",
+            "entryTypeInfo": {
+                "slug": "page",
+                "renderer": "page",
+                "package": "@inneropen/marvin-renderers-core",
+                "version": "^1.0.0",
+                "config": null,
+                "publishable": true,
+                "submittable": false,
+                "routable": true
+            },
+            "summary": "Links to the projects index.",
+            "publishedAt": "2026-07-13T00:25:03.570217Z",
+            "status": "published",
+            "collections": [
+                {
+                    "role": null,
+                    "position": 1,
+                    "metadataJson": null,
+                    "collection": {
+                        "slug": "footer-navigation",
+                        "name": "Footer Navigation",
+                        "description": "Ordered entries used for footer navigation and secondary site links.",
+                        "metadataJson": null,
+                        "sortOrder": 300
+                    }
+                },
+                {
+                    "role": null,
+                    "position": 1,
+                    "metadataJson": null,
+                    "collection": {
+                        "slug": "main-navigation",
+                        "name": "Main Navigation",
+                        "description": "Ordered entries used for the main website navigation.",
+                        "metadataJson": null,
+                        "sortOrder": 200
+                    }
+                }
+            ],
+            "assetSlugs": [],
+            "resourceSlugs": [],
+            "tags": [],
+            "metadataJson": {
+                "homeTeaser": {
+                    "headline": "On the bench",
+                    "copy": "Current builds, experiments, and available pieces."
+                }
+            },
+            "featuredAsset": null,
+            "order": 1
+        },
+        {
+            "slug": "bench-notes",
+            "title": "Bench Notes",
+            "entryType": "page",
+            "entryTypeInfo": {
+                "slug": "page",
+                "renderer": "page",
+                "package": "@inneropen/marvin-renderers-core",
+                "version": "^1.0.0",
+                "config": null,
+                "publishable": true,
+                "submittable": false,
+                "routable": true
+            },
+            "summary": "Links to workshop notes and process updates.",
+            "publishedAt": "2026-07-13T06:11:03.077002Z",
+            "status": "published",
+            "collections": [
+                {
+                    "role": null,
+                    "position": 2,
+                    "metadataJson": null,
+                    "collection": {
+                        "slug": "main-navigation",
+                        "name": "Main Navigation",
+                        "description": "Ordered entries used for the main website navigation.",
+                        "metadataJson": null,
+                        "sortOrder": 200
+                    }
+                },
+                {
+                    "role": null,
+                    "position": 1,
+                    "metadataJson": null,
+                    "collection": {
+                        "slug": "footer-navigation",
+                        "name": "Footer Navigation",
+                        "description": "Ordered entries used for footer navigation and secondary site links.",
+                        "metadataJson": null,
+                        "sortOrder": 300
+                    }
+                }
+            ],
+            "assetSlugs": [],
+            "resourceSlugs": [],
+            "tags": [],
+            "metadataJson": null,
+            "featuredAsset": null,
+            "order": 2
+        },
+        {
+            "slug": "workshop",
+            "title": "Workshop",
+            "entryType": "page",
+            "entryTypeInfo": {
+                "slug": "page",
+                "renderer": "page",
+                "package": "@inneropen/marvin-renderers-core",
+                "version": "^1.0.0",
+                "config": null,
+                "publishable": true,
+                "submittable": false,
+                "routable": true
+            },
+            "summary": "An introduction to the workshop, tools, and methods used to create each piece.",
+            "publishedAt": "2026-07-13T00:25:03.646720Z",
+            "status": "published",
+            "collections": [
+                {
+                    "role": null,
+                    "position": 4,
+                    "metadataJson": null,
+                    "collection": {
+                        "slug": "footer-navigation",
+                        "name": "Footer Navigation",
+                        "description": "Ordered entries used for footer navigation and secondary site links.",
+                        "metadataJson": null,
+                        "sortOrder": 300
+                    }
+                },
+                {
+                    "role": null,
+                    "position": 3,
+                    "metadataJson": null,
+                    "collection": {
+                        "slug": "main-navigation",
+                        "name": "Main Navigation",
+                        "description": "Ordered entries used for the main website navigation.",
+                        "metadataJson": null,
+                        "sortOrder": 200
+                    }
+                }
+            ],
+            "assetSlugs": [
+                "roastery-workshop-ai-generated-6d2d6d"
+            ],
+            "resourceSlugs": [],
+            "tags": [],
+            "metadataJson": null,
+            "featuredAsset": {
+                "slug": "roastery-workshop-ai-generated-6d2d6d",
+                "name": "Roastery Workshop (AI-generated)",
+                "mimeType": "image/png",
+                "assetType": "image",
+                "fileSize": 1973337,
+                "width": 1024,
+                "height": 1024,
+                "altText": "A cozy rustic workshop in warm morning light",
+                "description": null,
+                "publicUrl": "http://localhost:8080/assets/mash-burn-co/assets/2026/07/002dc892-dc0d-436f-b405-cc75115d266e-roastery-workshop.png",
+                "metadataJson": null,
+                "tags": []
+            },
+            "order": 3
+        },
+        {
+            "slug": "about",
+            "title": "About",
+            "entryType": "about",
+            "entryTypeInfo": {
+                "slug": "about",
+                "renderer": null,
+                "package": null,
+                "version": null,
+                "config": null,
+                "publishable": true,
+                "submittable": false,
+                "routable": true
+            },
+            "summary": "The story, philosophy, and values behind Mash & Burn Co.",
+            "publishedAt": "2026-07-13T21:26:43.213517Z",
+            "status": "published",
+            "collections": [
+                {
+                    "role": null,
+                    "position": 4,
+                    "metadataJson": null,
+                    "collection": {
+                        "slug": "main-navigation",
+                        "name": "Main Navigation",
+                        "description": "Ordered entries used for the main website navigation.",
+                        "metadataJson": null,
+                        "sortOrder": 200
+                    }
+                },
+                {
+                    "role": null,
+                    "position": 0,
+                    "metadataJson": null,
+                    "collection": {
+                        "slug": "footer-navigation",
+                        "name": "Footer Navigation",
+                        "description": "Ordered entries used for footer navigation and secondary site links.",
+                        "metadataJson": null,
+                        "sortOrder": 300
+                    }
+                }
+            ],
+            "assetSlugs": [
+                "stockcake-vintage-sewing-craft-3977238-small--generate",
+                "stockcake-vintage-denim-details-4015766-small",
+                "stockcake-needle-through-denim-2827323-small",
+                "stockcake-craftsmans-skilled-hands-3028264-small",
+                "stockcake-craftsmans-skilled-hands-2125086-medium",
+                "roastery-workshop-ai-generated-6d2d6d"
+            ],
+            "resourceSlugs": [],
+            "tags": [],
+            "metadataJson": null,
+            "featuredAsset": {
+                "slug": "stockcake-vintage-sewing-craft-3977238-small--generate",
+                "name": "StockCake Vintage Sewing Craft 3977238 Small (generate)",
+                "mimeType": "image/jpeg",
+                "assetType": "image",
+                "fileSize": 1435206,
+                "width": 1024,
+                "height": 1024,
+                "altText": null,
+                "description": null,
+                "publicUrl": "http://localhost:8080/assets/mash-burn-co/assets/2026/07/7643c8fe-e2ef-4911-a6a7-bf39c74ef677-stockcake-vintage-sewing-craft-3977238-small-generate.jpg",
+                "metadataJson": {
+                    "derived_from": "cc1a457f-e7f7-498a-a2a9-1429b26e2187",
+                    "derivation": "media:generate",
+                    "media_op": "generate",
+                    "prompt": "a hand-stitched leather tricorn hat on a weathered workshop bench, warm afternoon light through a window, leather tools and waxed thread beside it, moody rustic product photography"
+                },
+                "tags": []
+            },
+            "order": 4
+        },
+        {
+            "slug": "contact",
+            "title": "Contact",
+            "entryType": "contact",
+            "entryTypeInfo": {
+                "slug": "contact",
+                "renderer": null,
+                "package": null,
+                "version": null,
+                "config": null,
+                "publishable": true,
+                "submittable": false,
+                "routable": true
+            },
+            "summary": "How to get in touch with the workshop.",
+            "publishedAt": "2026-07-13T06:35:32.961344Z",
+            "status": "published",
+            "collections": [
+                {
+                    "role": null,
+                    "position": 5,
+                    "metadataJson": null,
+                    "collection": {
+                        "slug": "main-navigation",
+                        "name": "Main Navigation",
+                        "description": "Ordered entries used for the main website navigation.",
+                        "metadataJson": null,
+                        "sortOrder": 200
+                    }
+                },
+                {
+                    "role": null,
+                    "position": 1,
+                    "metadataJson": null,
+                    "collection": {
+                        "slug": "footer-navigation",
+                        "name": "Footer Navigation",
+                        "description": "Ordered entries used for footer navigation and secondary site links.",
+                        "metadataJson": null,
+                        "sortOrder": 300
+                    }
+                }
+            ],
+            "assetSlugs": [
+                "stockcake-denim-jeans-stack-226763-small",
+                "envelope",
+                "workshop-notebook",
+                "tailors-chalk",
+                "hang-tag",
+                "thread-spool"
+            ],
+            "resourceSlugs": [],
+            "tags": [],
+            "metadataJson": {
+                "component": "ContactForm",
+                "componentPlacement": "afterContent"
+            },
+            "featuredAsset": {
+                "slug": "stockcake-denim-jeans-stack-226763-small",
+                "name": "StockCake Denim Jeans Stack 226763 Small",
+                "mimeType": "image/jpeg",
+                "assetType": "image",
+                "fileSize": 23673,
+                "width": 204,
+                "height": 364,
+                "altText": "A neatly stacked display of various denim jeans in different shades of blue.",
+                "description": "The image shows a well-organized stack of denim jeans in a retail setting. The jeans are arranged in various shades of blue, from light to dark, with some pairs folded neatly while others are displayed more casually. The setting appears to be a clothing store, with wooden shelving in the background, creating a warm and inviting atmosphere.",
+                "publicUrl": "http://localhost:8080/assets/mash-burn-co/assets/2026/07/eb881713-3af9-4590-b821-8fda3eedb5fd-stockcake-denim_jeans_stack-226763-small.jpg",
+                "metadataJson": {
+                    "asset": "asset"
+                },
+                "tags": []
+            },
+            "order": 5
+        }
+    ]
+}
