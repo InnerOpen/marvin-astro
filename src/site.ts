@@ -147,6 +147,13 @@ export function createSiteLoader(fetcher: MarvinFetcher, options: SiteOptions = 
     return assetUrl(await fetcher.asset(slug));
   }
 
+  // Resolve a value only when it looks like a bare asset slug; a URL/path/data URI (or a slug with
+  // no matching asset) is returned unchanged.
+  async function resolveMaybeSlug(value: string | undefined): Promise<string | undefined> {
+    if (!value || !looksLikeAssetSlug(value)) return value;
+    return (await resolveAssetSlug(value)) ?? value;
+  }
+
   async function load(): Promise<ApiSite> {
     const marvinSite = await fetcher.site();
     if (!marvinSite) return fallback;
@@ -179,12 +186,18 @@ export function createSiteLoader(fetcher: MarvinFetcher, options: SiteOptions = 
         ? (brandBySlug.get(rawImage) ?? (await resolveAssetSlug(rawImage)))
         : undefined;
 
+    // The top-level `site_logo` / `site_favicon` fields may be bare asset slugs too (like brand.*
+    // and og:image) — resolve them so they can reference an uploaded asset by slug. The brand-map
+    // aliases still win when present.
+    const logo = brand.logo ?? (await resolveMaybeSlug(site.logo));
+    const favicon = brand.favicon ?? (await resolveMaybeSlug(site.favicon));
+
     return {
       ...site,
       brand,
       // Convenience aliases for common callers; all of these also live in `site.brand`.
-      logo: brand.logo ?? site.logo,
-      favicon: brand.favicon ?? site.favicon,
+      logo,
+      favicon,
       seal: brand.seal ?? site.seal,
       seo: { ...site.seo, image: ogImage ?? site.seo.image },
     };

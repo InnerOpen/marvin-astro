@@ -159,6 +159,50 @@ describe('getSite', () => {
     expect((await marvin.getSite()).seo.image).toBe('/og/default.png');
   });
 
+  it('resolves top-level site_logo / site_favicon given as bare asset slugs', async () => {
+    const withSlugChrome = {
+      workspace: { slug: 'ws', name: 'WS' },
+      site: { title: 'T', locale: 'en-US', timezone: 'UTC', logo: 'chrome-logo', favicon: 'chrome-favicon', metadataJson: {} },
+    } as unknown as MarvinSite;
+    const fake = createFakeClient({
+      site: withSlugChrome,
+      assets: {
+        'chrome-logo': fakeAsset('chrome-logo', 'https://cdn.test/chrome-logo.svg'),
+        'chrome-favicon': fakeAsset('chrome-favicon', 'https://cdn.test/chrome-favicon.png'),
+      },
+    });
+    const marvin = createMarvinContent({ ...CONNECTION, createClient: () => fake.client, site: { fallback: STATIC_SITE } });
+    const site = await marvin.getSite();
+
+    expect(site.logo).toBe('https://cdn.test/chrome-logo.svg');
+    expect(site.favicon).toBe('https://cdn.test/chrome-favicon.png');
+  });
+
+  it('leaves a top-level logo/favicon that is already a URL or path alone', async () => {
+    const withUrlChrome = {
+      workspace: { slug: 'ws', name: 'WS' },
+      site: { title: 'T', locale: 'en-US', timezone: 'UTC', logo: 'https://cdn.test/x.svg', favicon: '/favicon.ico', metadataJson: {} },
+    } as unknown as MarvinSite;
+    const fake = createFakeClient({ site: withUrlChrome, assets: {} });
+    const marvin = createMarvinContent({ ...CONNECTION, createClient: () => fake.client, site: { fallback: STATIC_SITE } });
+    const site = await marvin.getSite();
+
+    expect(site.logo).toBe('https://cdn.test/x.svg');
+    expect(site.favicon).toBe('/favicon.ico');
+  });
+
+  it('keeps a top-level logo slug with no matching asset as-is', async () => {
+    const withMissing = {
+      workspace: { slug: 'ws', name: 'WS' },
+      site: { title: 'T', locale: 'en-US', timezone: 'UTC', logo: 'no-such-asset', metadataJson: {} },
+    } as unknown as MarvinSite;
+    const fake = createFakeClient({ site: withMissing, assets: {} });
+    const marvin = createMarvinContent({ ...CONNECTION, createClient: () => fake.client, site: { fallback: STATIC_SITE } });
+    const site = await marvin.getSite();
+
+    expect(site.logo).toBe('no-such-asset');
+  });
+
   it('falls back to static identity when the backend is unreachable', async () => {
     const fake = createFakeClient({ throws: networkError() });
     const marvin = createMarvinContent({
