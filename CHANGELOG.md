@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/inneropen/marvin-astro/compare/v1.0.0...v1.1.0) (2026-07-26)
+
+
+### Features
+
+* **site:** resolve top-level logo/favicon asset slugs ([080162c](https://github.com/inneropen/marvin-astro/commit/080162cbfba6a0e61a5d9ca9b3f6511fba252662))
+
 # 1.0.0-next.1 (2026-07-26)
 
 
