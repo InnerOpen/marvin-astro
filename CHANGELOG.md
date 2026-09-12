@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/inneropen/marvin-astro/compare/v1.1.0...v1.1.1) (2026-09-12)
+
+
+### Performance Improvements
+
+* serve bySlug from the loaded list; bounded, retrying hydrate ([dacbd94](https://github.com/inneropen/marvin-astro/commit/dacbd94185abd2bbc786431135871f70d0b85b97))
+
 # [1.1.0](https://github.com/inneropen/marvin-astro/compare/v1.0.0...v1.1.0) (2026-07-26)
 
 
