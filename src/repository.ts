@@ -48,7 +48,10 @@ export type RepositoryOptions<T> = {
 export type Repository<T> = {
   /** Every item, resolved once per process. */
   all(): Promise<T[]>;
-  /** One item by slug — a direct entry fetch, falling back to a scan of `all()`. */
+  /**
+   * One item by slug. Served from `all()` once that has loaded; otherwise a direct entry
+   * fetch, falling back to a scan of `all()`.
+   */
   bySlug(slug: string): Promise<T | undefined>;
   /** The first featured item, or the first item when none is marked. */
   featured(): Promise<T | undefined>;
@@ -125,7 +128,19 @@ export function createRepository<T>(
     return useFallback();
   }
 
+  function findInList(items: T[], slug: string): T | undefined {
+    return items.find((item) => slugOf(item) === slug);
+  }
+
   async function loadBySlug(slug: string): Promise<T | undefined> {
+    // Once the list has loaded, every slug in it is already transformed — a per-entry fetch
+    // would be a second request (and a second hydration) for the same content. On a 280-entry
+    // site that was ~1.4s per detail page.
+    if (allPromise) {
+      const listed = findInList(await allPromise, slug);
+      if (listed) return listed;
+    }
+
     if (fetcher.backend.hasBackend()) {
       try {
         const entry = await fetcher.entry(slug);
@@ -138,7 +153,7 @@ export function createRepository<T>(
 
     // No backend, no such entry, or a transform that blew up: fall back to the resolved list,
     // which is either Marvin's or the static data — the caller doesn't need to care which.
-    return (await all()).find((item) => slugOf(item) === slug);
+    return findInList(await all(), slug);
   }
 
   function all(): Promise<T[]> {

@@ -23,6 +23,35 @@ export type HydratedEntry = MarvinEntry | Entry;
 
 export type MarvinFetcher = ReturnType<typeof createFetcher>;
 
+/** A failed hydration read is retried this many times in total, backing off from this base. */
+export const HYDRATE_ATTEMPTS = 3;
+export const HYDRATE_BACKOFF_MS = 500;
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/** `Promise.all(items.map(run))` with at most `limit` calls in flight. Order is preserved. */
+async function mapWithConcurrency<T, R>(
+  items: T[],
+  limit: number,
+  run: (item: T) => Promise<R>
+): Promise<R[]> {
+  const results = new Array<R>(items.length);
+  let next = 0;
+
+  async function worker(): Promise<void> {
+    while (next < items.length) {
+      const index = next++;
+      results[index] = await run(items[index]);
+    }
+  }
+
+  const workers = Array.from({ length: Math.min(limit, items.length) }, worker);
+  await Promise.all(workers);
+  return results;
+}
+
 export function createFetcher(backend: MarvinBackend) {
   async function guarded<T>(label: string, empty: T, run: () => Promise<T>): Promise<T> {
     if (!backend.hasBackend()) return empty;
@@ -40,6 +69,37 @@ export function createFetcher(backend: MarvinBackend) {
   }
 
   /**
+   * One entry read that survives a transient failure.
+   *
+   * `entry()` can't be used here: `guarded` swallows the error and trips the latch, and a
+   * tripped latch turns every remaining item into a silent null. So retry with backoff,
+   * re-opening the latch first in case a sibling read tripped it, and only remember the
+   * failure — and warn — once the attempts are spent.
+   */
+  async function entryForHydration(slug: string): Promise<Entry | null> {
+    if (!backend.hasBackend()) return null;
+
+    let failure: unknown;
+    for (let attempt = 1; attempt <= HYDRATE_ATTEMPTS; attempt++) {
+      if (attempt > 1) {
+        await sleep(HYDRATE_BACKOFF_MS * 2 ** (attempt - 2));
+        if (backend.isLatched()) backend.clearLatch();
+      }
+      try {
+        return await backend.client().entry(slug);
+      } catch (error) {
+        failure = error;
+      }
+    }
+
+    backend.remember(failure);
+    backend.warn(
+      `Entry "${slug}" dropped after ${HYDRATE_ATTEMPTS} attempts: ${errorMessage(failure)}`
+    );
+    return null;
+  }
+
+  /**
    * Turn list items into full entries.
    *
    * The collection endpoint returns `PublishedEntryListItem` — core fields plus
@@ -47,10 +107,16 @@ export function createFetcher(backend: MarvinBackend) {
    * includes it. So any field defined by the entry type's schema is unreadable from a list
    * item; it only appears after this hydration pass. Items that already carry data are passed
    * through untouched.
+   *
+   * Reads run at most `config.hydrateConcurrency` at a time. Unbounded, a 280-entry collection
+   * fired 280 requests at once, most of which timed out and were dropped — and the first
+   * timeout latched the backend off for the rest of the build.
    */
   async function hydrate(entries: MarvinContentEntry[]): Promise<HydratedEntry[]> {
-    const hydrated = await Promise.all(
-      entries.map(async (item) => {
+    const hydrated = await mapWithConcurrency(
+      entries,
+      backend.config.hydrateConcurrency,
+      async (item) => {
         if (
           typeof (item as { field?: unknown }).field === 'function' ||
           'data' in item ||
@@ -58,8 +124,8 @@ export function createFetcher(backend: MarvinBackend) {
         ) {
           return item as HydratedEntry;
         }
-        return entry(item.slug ?? '');
-      })
+        return entryForHydration(item.slug ?? '');
+      }
     );
 
     return hydrated.filter((item): item is HydratedEntry => Boolean(item));

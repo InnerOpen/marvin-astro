@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { DEFAULT_DEV_RETRY_MS, describeConfig, readEnv, resolveConfig } from '../src/config.js';
+import {
+  DEFAULT_DEV_RETRY_MS,
+  DEFAULT_HYDRATE_CONCURRENCY,
+  describeConfig,
+  readEnv,
+  resolveConfig,
+} from '../src/config.js';
 
 describe('readEnv', () => {
   it('prefers the override map and treats blank/missing as absent', () => {
@@ -38,6 +44,12 @@ describe('resolveConfig', () => {
   it('honours an explicit retryAfterMs and defaults to the dev latch otherwise', () => {
     expect(resolveConfig({ retryAfterMs: 5 }).retryAfterMs).toBe(5);
     expect(resolveConfig({ env: {} }).retryAfterMs).toBe(DEFAULT_DEV_RETRY_MS);
+  });
+
+  it('defaults hydrateConcurrency and clamps an explicit value to at least one', () => {
+    expect(resolveConfig({ env: {} }).hydrateConcurrency).toBe(DEFAULT_HYDRATE_CONCURRENCY);
+    expect(resolveConfig({ hydrateConcurrency: 2 }).hydrateConcurrency).toBe(2);
+    expect(resolveConfig({ hydrateConcurrency: 0 }).hydrateConcurrency).toBe(1);
   });
 });
 

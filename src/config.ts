@@ -24,6 +24,9 @@ export const ENV_KEYS = {
 /** Dev default for the network-failure latch: retry a downed backend after 30s. */
 export const DEFAULT_DEV_RETRY_MS = 30_000;
 
+/** How many entry reads `hydrate` keeps in flight at once. */
+export const DEFAULT_HYDRATE_CONCURRENCY = 6;
+
 export type MarvinAstroConfig = {
   apiUrl?: string;
   siteClientToken?: string;
@@ -36,6 +39,12 @@ export type MarvinAstroConfig = {
    * consistently rather than half-succeed with some pages live and some pages static.
    */
   retryAfterMs?: number;
+  /**
+   * Maximum entry reads in flight at once while hydrating a collection. Firing every read at
+   * once makes a large collection time out on itself; the default of 6 keeps a 280-entry
+   * hydration well inside the SDK's per-request timeout.
+   */
+  hydrateConcurrency?: number;
   logger?: MarvinLogger;
   /** Markdown rendering options; defaults to `{ gfm: true, breaks: false }`. */
   markdown?: MarkdownOptions;
@@ -60,6 +69,7 @@ export type ResolvedConfig = {
   workspaceSlug: string;
   debug: boolean;
   retryAfterMs: number;
+  hydrateConcurrency: number;
   logger: MarvinLogger;
   markdown?: MarkdownOptions;
   now: () => number;
@@ -118,6 +128,7 @@ export function resolveConfig(options: MarvinAstroConfig = {}): ResolvedConfig {
     retryAfterMs:
       options.retryAfterMs ??
       (isProduction(env) ? Number.POSITIVE_INFINITY : DEFAULT_DEV_RETRY_MS),
+    hydrateConcurrency: Math.max(1, Math.floor(options.hydrateConcurrency ?? DEFAULT_HYDRATE_CONCURRENCY)),
     logger: options.logger ?? console,
     markdown: options.markdown,
     now: options.now ?? (() => Date.now()),

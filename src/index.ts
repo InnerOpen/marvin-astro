@@ -109,6 +109,7 @@ export {
 } from './client.js';
 export {
   DEFAULT_DEV_RETRY_MS,
+  DEFAULT_HYDRATE_CONCURRENCY,
   ENV_KEYS,
   describeConfig,
   readEnv,

@@ -73,6 +73,9 @@ const { site, mainNavigation } = await marvin.getSiteChrome();
 
 `posts.all()` · `posts.bySlug(slug)` · `posts.featured()` · `posts.allFeatured()` · `posts.reset()`
 
+`bySlug` serves from the loaded list once `all()` has resolved — no extra request per detail
+page — and only fetches the entry directly when nothing is loaded yet or the slug isn't in it.
+
 ## Why `hydrate`
 
 The collection endpoint returns `PublishedEntryListItem`, which carries core fields and
@@ -81,6 +84,14 @@ which includes it.
 
 So if a transform reads any schema-defined field — anything beyond title/slug/summary/metadata —
 `hydrate: true` is required or those fields come back `undefined`. It costs one request per entry.
+
+Those requests run at most `hydrateConcurrency` at a time (default 6) rather than all at once, and
+a read that fails is retried with backoff (3 attempts) before the entry is dropped, so a single
+transient failure neither loses an item nor latches the backend off for the rest of the build.
+
+```ts
+createMarvinContent({ hydrateConcurrency: 4 });
+```
 
 ## Field precedence
 

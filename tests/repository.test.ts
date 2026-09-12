@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { createMarvinContent } from '../src/index.js';
 import { createFakeClient, networkError, quietLogger } from './support/fakeClient.js';
 import {
+  asEntry,
   footerNavigationListItems,
   projectRead,
   referenceRead,
@@ -257,6 +258,44 @@ describe('repository: bySlug', () => {
 
     expect(faq?.body).toContain('Do You Release Collections?');
     expect(fake.countOf('collections.entries')).toBe(0);
+    expect(fake.countOf('entry:')).toBe(1);
+  });
+
+  it('serves from the loaded list without an entry fetch once all() has resolved', async () => {
+    const { marvin, fake } = contentWith({
+      collections: { 'workshop-reference': workshopReferenceListItems },
+      entries: FULL_READS,
+    });
+    const references = marvin.repository<Reference>({
+      collection: 'workshop-reference',
+      transform: (entry) => ({ slug: entry.slug ?? '', title: entry.title ?? '', order: 0 }),
+    });
+
+    const all = await references.all();
+    const faq = await references.bySlug('faq');
+
+    expect(faq).toBe(all.find((item) => item.slug === 'faq'));
+    expect(fake.countOf('entry:')).toBe(0);
+  });
+
+  it('falls back to an entry fetch, then the list, for a slug all() does not contain', async () => {
+    const { marvin, fake } = contentWith({
+      collections: { 'workshop-reference': workshopReferenceListItems },
+      entries: FULL_READS,
+    });
+    const references = marvin.repository<Reference>({
+      collection: 'workshop-reference',
+      transform: (entry) => ({ slug: entry.slug ?? '', title: entry.title ?? '', order: 0 }),
+    });
+    await references.all();
+
+    // In Marvin but not in this collection: the entry endpoint still finds it.
+    expect((await references.bySlug(projectRead.slug))?.title).toBe(projectRead.title);
+    expect(fake.countOf(`entry:${projectRead.slug}`)).toBe(1);
+
+    // Nowhere at all: the entry endpoint misses and the list scan comes up empty.
+    expect(await references.bySlug('does-not-exist')).toBeUndefined();
+    expect(fake.countOf('entry:does-not-exist')).toBe(1);
   });
 
   it('falls back to a scan of all() when the entry is not in Marvin', async () => {
@@ -356,11 +395,13 @@ describe('repository: memoization', () => {
       transform: (entry) => ({ slug: entry.slug ?? '', title: entry.title ?? '', order: 0 }),
     });
 
-    await references.all();
+    // bySlug before all() each round, so it proves the slug cache dropped rather than being
+    // served from the (also dropped) list.
     await references.bySlug('faq');
+    await references.all();
     references.reset();
-    await references.all();
     await references.bySlug('faq');
+    await references.all();
 
     expect(fake.countOf('collections.entries')).toBe(2);
     expect(fake.countOf('entry:faq')).toBe(2);
@@ -402,6 +443,39 @@ describe('repository: href', () => {
     const faq = (await references.all()).find((item) => item.slug === 'faq');
 
     expect(faq?.href).toBe('/workshop-reference/faq');
+  });
+});
+
+describe('repository: hydration concurrency', () => {
+  it('never has more than hydrateConcurrency entry reads in flight', async () => {
+    const CONCURRENCY = 2;
+    let inFlight = 0;
+    let peak = 0;
+    const client = {
+      collections: { entries: async () => workshopReferenceListItems },
+      entry: async (slug: string) => {
+        inFlight += 1;
+        peak = Math.max(peak, inFlight);
+        await new Promise((resolve) => setTimeout(resolve, 1));
+        inFlight -= 1;
+        return asEntry({ ...referenceRead, slug });
+      },
+    };
+    const marvin = createMarvinContent({
+      ...CONNECTION,
+      hydrateConcurrency: CONCURRENCY,
+      createClient: () => client,
+    });
+    const references = marvin.repository<Reference>({
+      collection: 'workshop-reference',
+      hydrate: true,
+      transform: (entry) => ({ slug: entry.slug ?? '', title: entry.title ?? '', order: 0 }),
+    });
+
+    const all = await references.all();
+
+    expect(all.length).toBe(workshopReferenceListItems.length);
+    expect(peak).toBe(CONCURRENCY);
   });
 });
 
