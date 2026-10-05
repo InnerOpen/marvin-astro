@@ -569,3 +569,84 @@ describe('repository: entries with no full read', () => {
     expect(await links.all()).toEqual([]);
   });
 });
+
+describe('repository: hydrate with expand=full', () => {
+  it('loads an expanded list in one request, with no per-entry reads', async () => {
+    const { marvin, fake } = contentWith({
+      collections: { projects: [listItemOf(projectRead), listItemOf(referenceRead)] },
+      expandedCollections: { projects: [projectRead, referenceRead] },
+      entries: FULL_READS,
+    });
+    const projects = marvin.repository<Project>({
+      collection: 'projects',
+      hydrate: true,
+      transform: projectTransform,
+    });
+
+    const all = await projects.all();
+    const project = all.find((item) => item.slug === projectRead.slug);
+
+    expect(fake.countOf('collections.entries.expand:projects')).toBe(1);
+    expect(fake.countOf('collections.entries:projects')).toBe(1);
+    expect(fake.countOf('entry:')).toBe(0);
+    expect(all).toHaveLength(2);
+    expect(project?.image).toBe(HERO_GRADE_URL);
+    expect(project?.materials).toBe(RESOURCE_COUNT);
+  });
+
+  it('serves bySlug from the expanded list without another request', async () => {
+    const { marvin, fake } = contentWith({
+      collections: { projects: [listItemOf(projectRead)] },
+      expandedCollections: { projects: [projectRead] },
+      entries: FULL_READS,
+    });
+    const projects = marvin.repository<Project>({
+      collection: 'projects',
+      hydrate: true,
+      transform: projectTransform,
+    });
+
+    const [listed] = await projects.all();
+    const detail = await projects.bySlug(projectRead.slug);
+
+    expect(detail).toBe(listed);
+    expect(fake.countOf('entry:')).toBe(0);
+  });
+
+  it('falls back to per-entry reads when the server (or SDK) ignores expand', async () => {
+    const { marvin, fake } = contentWith({
+      collections: { projects: [listItemOf(projectRead), listItemOf(referenceRead)] },
+      entries: FULL_READS,
+    });
+    const projects = marvin.repository<Project>({
+      collection: 'projects',
+      hydrate: true,
+      transform: projectTransform,
+    });
+
+    const all = await projects.all();
+    const project = all.find((item) => item.slug === projectRead.slug);
+
+    expect(fake.countOf('collections.entries.expand:projects')).toBe(1);
+    expect(fake.countOf(`entry:${projectRead.slug}`)).toBe(1);
+    expect(fake.countOf(`entry:${referenceRead.slug}`)).toBe(1);
+    expect(project?.image).toBe(HERO_GRADE_URL);
+    expect(project?.materials).toBe(RESOURCE_COUNT);
+  });
+
+  it('does not ask for expand when hydrate is off', async () => {
+    const { marvin, fake } = contentWith({
+      collections: { projects: [listItemOf(projectRead)] },
+      expandedCollections: { projects: [projectRead] },
+    });
+    const projects = marvin.repository<Reference>({
+      collection: 'projects',
+      transform: (entry) => ({ slug: entry.slug ?? '', title: entry.title ?? '', order: 0 }),
+    });
+
+    await projects.all();
+
+    expect(fake.countOf('collections.entries.expand:')).toBe(0);
+    expect(fake.countOf('collections.entries:projects')).toBe(1);
+  });
+});

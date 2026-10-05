@@ -26,8 +26,10 @@ export type RepositoryOptions<T> = {
    * The collection endpoint returns `PublishedEntryListItem`, which has no `assets[]` or
    * `resources[]` (only their slugs) and, on older servers, no `data_json`; the single-entry
    * endpoint returns `PublishedEntryRead`, which has all of it. So if the transform reads asset
-   * roles, resources, or (on an older server) any schema field, this must be `true`. It costs one
-   * request per entry. `bySlug` always works from full entries either way.
+   * roles, resources, or (on an older server) any schema field, this must be `true`. The list is
+   * requested with `expand=full`, which returns full entries in the one request; a server or SDK
+   * without it (SDK < 4.2) costs one more request per entry. `bySlug` always works from full
+   * entries either way.
    */
   hydrate?: boolean;
   /** Build the resolved item from an entry. May be async (e.g. to render markdown). */

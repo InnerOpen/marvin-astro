@@ -129,6 +129,60 @@ describe('createFetcher — hydrate', () => {
   });
 });
 
+describe('createFetcher — hydratedCollectionEntries', () => {
+  it('asks for expand=full and passes the full entries through without a read each', async () => {
+    const full = { slug: 'full', data: {}, assets: [], resources: [] };
+    const calls: unknown[][] = [];
+    const reads: string[] = [];
+    const client = {
+      collections: {
+        entries: async (...args: unknown[]) => {
+          calls.push(args);
+          return [full];
+        },
+      },
+      entry: async (slug: string) => {
+        reads.push(slug);
+        return null;
+      },
+    };
+    const { backend } = makeBackend({ client });
+
+    expect(await createFetcher(backend).hydratedCollectionEntries('projects')).toEqual([full]);
+    expect(calls).toEqual([['projects', { expand: 'full' }]]);
+    expect(reads).toEqual([]);
+  });
+
+  it('reads each item when the list comes back unexpanded', async () => {
+    const client = {
+      collections: { entries: async () => [{ slug: 'a', assetSlugs: [], resourceSlugs: [] }] },
+      entry: async (slug: string) => ({ slug, assets: [], resources: [] }),
+    };
+    const { backend } = makeBackend({ client });
+
+    expect(await createFetcher(backend).hydratedCollectionEntries('projects')).toEqual([
+      { slug: 'a', assets: [], resources: [] },
+    ]);
+  });
+
+  it('leaves the plain collectionEntries call alone', async () => {
+    const calls: unknown[][] = [];
+    const client = {
+      collections: {
+        entries: async (...args: unknown[]) => {
+          calls.push(args);
+          return [];
+        },
+      },
+    };
+    const { backend } = makeBackend({ client });
+
+    await createFetcher(backend).collectionEntries('projects');
+
+    expect(calls).toEqual([['projects']]);
+  });
+});
+
 describe('createFetcher — hydrate retries', () => {
   const bare = (slug: string) => ({ slug }) as unknown as MarvinContentEntry;
 

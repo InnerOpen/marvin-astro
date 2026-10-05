@@ -86,12 +86,15 @@ placements (so no roles, no `hero-grade` image) and no `resources[]`. The single
 returns `PublishedEntryRead`, which has all of it.
 
 So if a transform reads asset roles, resources, or (on an older server, whose list items lack
-`data`) any schema field, `hydrate: true` is required. It costs one request per entry. Items are
-re-read unless they're already full entries (`isFullEntry`: `assets[]`/`resources[]` present, no
-`assetSlugs`) — carrying `data` isn't enough. `bySlug()` serves a detail page from the loaded list
-only when that item came from a full entry; otherwise it fetches the entry.
+`data`) any schema field, `hydrate: true` is required. A hydrated list is requested with
+`expand=full`, and a Marvin server that supports it returns every entry in full in that one
+request (this needs `@inneropen/marvin-sdk` 4.2 or later; older SDKs drop the option). Against an
+older server or SDK the list comes back as list items, and hydrating costs one more request per
+entry. Items are re-read unless they're already full entries (`isFullEntry`: `assets[]`/`resources[]`
+present, no `assetSlugs`) — carrying `data` isn't enough. `bySlug()` serves a detail page from the
+loaded list only when that item came from a full entry; otherwise it fetches the entry.
 
-Those requests run at most `hydrateConcurrency` at a time (default 6) rather than all at once, and
+Those per-entry requests run at most `hydrateConcurrency` at a time (default 6) rather than all at once, and
 a read that fails is retried with backoff (3 attempts) before the entry is dropped, so a single
 transient failure neither loses an item nor latches the backend off for the rest of the build.
 

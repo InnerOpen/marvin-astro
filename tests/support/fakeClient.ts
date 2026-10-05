@@ -11,6 +11,12 @@ import { asEntry } from './fixtures.js';
 export type FakeClientSetup = {
   /** Collection slug → the entries that collection returns. */
   collections?: Record<string, unknown[]>;
+  /**
+   * Collection slug → the full entries `collections.entries(slug, { expand: 'full' })` returns,
+   * as SDK 4.2+ against an expanding server does. Unset, the option is ignored and `collections`
+   * answers, as an older SDK or server does.
+   */
+  expandedCollections?: Record<string, MarvinEntry[]>;
   /** Entry slug → the full read for that entry. */
   entries?: Record<string, MarvinEntry>;
   site?: MarvinSite | null;
@@ -43,8 +49,13 @@ export function createFakeClient(setup: FakeClientSetup = {}): FakeClient {
         ),
       get: async (slug: string) =>
         record(`collections.get:${slug}`, () => ({ slug, entries: setup.collections?.[slug] ?? [] })),
-      entries: async (slug: string) =>
-        record(`collections.entries:${slug}`, () => setup.collections?.[slug] ?? []),
+      entries: async (slug: string, options?: { expand?: 'full' }) => {
+        const expanded = options?.expand === 'full' ? setup.expandedCollections?.[slug] : undefined;
+        if (options?.expand === 'full') calls.push(`collections.entries.expand:${slug}`);
+        return record(`collections.entries:${slug}`, () =>
+          expanded ? expanded.map(asEntry) : (setup.collections?.[slug] ?? [])
+        );
+      },
     },
     entry: async (slug: string): Promise<Entry | null> =>
       record(`entry:${slug}`, () => {

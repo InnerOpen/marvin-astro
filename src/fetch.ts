@@ -24,6 +24,17 @@ export type HydratedEntry = MarvinEntry | Entry;
 export type MarvinFetcher = ReturnType<typeof createFetcher>;
 
 /**
+ * `collections.entries` as SDK 4.2+ declares it: `{ expand: 'full' }` asks the server for full
+ * entries (`?expand=full`) and returns them as SDK `Entry` objects. Older SDKs take only the slug
+ * and ignore the option, so the same call works with any SDK in the peer range; their list items
+ * are then hydrated one by one.
+ */
+type ExpandingCollectionEntries = (
+  slug: string,
+  options?: { expand?: 'full' }
+) => Promise<MarvinContentEntry[]>;
+
+/**
  * True for a full entry (`PublishedEntryRead`), false for a list item (`PublishedEntryListItem`).
  *
  * `data` doesn't tell them apart: list items carry it too now. What differs is attachments. A full
@@ -122,12 +133,26 @@ export function createFetcher(backend: MarvinBackend) {
    * (on current servers) `data`, but only asset/resource *slugs* — no `assets[]` placements (so
    * no roles: no `hero-grade` image) and no `resources[]`. `PublishedEntryRead` (the single-entry
    * endpoint) has all of it. Only items that are already full entries ({@link isFullEntry}) are
-   * passed through; everything else is re-read, even when it carries `data`.
+   * passed through; everything else is re-read, even when it carries `data`. A list fetched with
+   * `expand=full` ({@link expandedCollectionEntries}) is all full entries, so nothing is re-read.
    *
    * Reads run at most `config.hydrateConcurrency` at a time. Unbounded, a 280-entry collection
    * fired 280 requests at once, most of which timed out and were dropped — and the first
    * timeout latched the backend off for the rest of the build.
    */
+  /**
+   * A collection's entries as full entries in one request, where the server and SDK support
+   * `expand=full` (Marvin core with expand, `@inneropen/marvin-sdk` 4.2+). Otherwise this is
+   * `collectionEntries`: list items, which {@link hydrate} reads one at a time.
+   */
+  function expandedCollectionEntries(slug: string): Promise<MarvinContentEntry[]> {
+    return guarded(`Collection entries "${slug}"`, [], () => {
+      const collections = backend.client().collections;
+      const entries = collections.entries as ExpandingCollectionEntries;
+      return entries.call(collections, slug, { expand: 'full' });
+    });
+  }
+
   async function hydrate(entries: MarvinContentEntry[]): Promise<HydratedEntry[]> {
     const hydrated = await mapWithConcurrency(
       entries,
@@ -170,8 +195,11 @@ export function createFetcher(backend: MarvinBackend) {
       return [];
     },
 
+    expandedCollectionEntries,
+
+    /** Full entries: one `expand=full` request, or per-item reads where that isn't supported. */
     async hydratedCollectionEntries(slug: string): Promise<HydratedEntry[]> {
-      return hydrate(await this.collectionEntries(slug));
+      return hydrate(await expandedCollectionEntries(slug));
     },
 
     async hydratedCollectionEntriesFallback(slugs: string[]): Promise<HydratedEntry[]> {
