@@ -1,0 +1,24 @@
+---
+/**
+ * EmbedLoader — put this once in your layout.
+ *
+ * In `click_to_load` mode an embed renders as a facade: a button plus a plain link, and no request
+ * to the provider. On click (or Enter/Space — it's a real button) this swaps the button for the
+ * iframe, built only from the facade's `data-marvin-embed-attrs` and refused unless its src is
+ * https on a host in `data-marvin-embed-hosts`.
+ *
+ * Also brings in the base `.marvin-embed` CSS (low-specificity, themeable through
+ * `--marvin-embed-*` custom properties).
+ *
+ * The script is processed by Astro (deduplicated to one per page, however many embeds), so it can
+ * share its tested logic with `<Embed>`. Astro inlines a script this small; if your CSP forbids
+ * inline scripts, hash it or set `vite.build.assetsInlineLimit: 0` to get a file instead.
+ */
+import './embeds.css';
+---
+
+<script>
+  import { installEmbedLoader } from './embed-frame';
+
+  installEmbedLoader(document);
+</script>

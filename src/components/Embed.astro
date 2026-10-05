@@ -1,0 +1,117 @@
+---
+/**
+ * Embed — render a Marvin `PublishedEmbed` from its structured fields.
+ *
+ * - `status: 'ok'` with an allowed iframe → the player (`mode="direct"`) or a click-to-load facade
+ *   (`mode="click_to_load"`, the default: nothing loads from the provider until the visitor clicks).
+ * - anything else → a plain link card.
+ *
+ * Use it for `embed` fields (`f.embed('video')`). Markdown bodies already carry Marvin's own
+ * embed HTML, so they don't need it. Facades need `<EmbedLoader />` once in the layout.
+ */
+import type { MarvinEmbed, MarvinEmbedMode } from '../embeds.js';
+import { frameHostPattern, iframeAttributes, safeLinkHref } from './embed-frame.js';
+import LinkCard from './LinkCard.astro';
+
+interface Props {
+  embed: MarvinEmbed | null | undefined;
+  /** `site.embeds.mode`. Default `click_to_load`. */
+  mode?: MarvinEmbedMode;
+  /** `site.embeds.consentText`, shown on the facade. `{provider}` becomes the provider name. */
+  consentText?: string;
+  /**
+   * `site.embeds.frameSources`. When given, an iframe outside them renders as a link card.
+   * Otherwise the iframe's own host is the only one its facade may load.
+   */
+  frameSources?: string[];
+  class?: string;
+}
+
+const { embed, mode = 'click_to_load', consentText, frameSources, class: className } = Astro.props;
+
+const iframe = embed?.status === 'ok' ? embed.iframe : undefined;
+const ownHost = iframe?.src ? safeHostOf(iframe.src) : undefined;
+const hosts = frameSources?.length ? frameSources : ownHost ? [ownHost] : [];
+const attributes = iframe
+  ? iframeAttributes(
+      {
+        src: iframe.src,
+        title: iframe.title || embed?.title || embed?.providerName,
+        allow: iframe.allow,
+        sandbox: iframe.sandbox,
+        referrerpolicy: iframe.referrerpolicy ?? 'strict-origin-when-cross-origin',
+        loading: 'lazy',
+      },
+      hosts
+    )
+  : undefined;
+
+function safeHostOf(src: string): string | undefined {
+  try {
+    return frameHostPattern(new URL(src).hostname);
+  } catch {
+    return undefined;
+  }
+}
+
+// Size travels as CSS custom properties on the figure; the base CSS turns them into an
+// aspect ratio (video) or a fixed height (audio). Values are validated, never passed raw.
+function sizeStyle(): string | undefined {
+  const aspect = iframe?.aspectRatio?.trim();
+  if (aspect && /^\d+(\.\d+)?\s*\/\s*\d+(\.\d+)?$/.test(aspect)) {
+    return `--marvin-embed-aspect: ${aspect}`;
+  }
+  const height = iframe?.height;
+  if (typeof height === 'number' && Number.isFinite(height) && height > 0) {
+    return `--marvin-embed-height: ${Math.round(height)}px`;
+  }
+  return undefined;
+}
+
+const kind = embed ? String(embed.kind).replace(/[^a-z0-9-]/gi, '') || 'video' : 'video';
+const providerName = embed?.providerName || embed?.link?.providerName || 'the provider';
+const label = embed?.title || embed?.link?.title || `${providerName} ${kind}`;
+const consent = (consentText || `Loads content from {provider}.`).replaceAll(
+  '{provider}',
+  providerName
+);
+const linkHref = safeLinkHref(embed?.link?.href ?? embed?.url);
+const classes = (...names: (string | false | undefined)[]) => names.filter(Boolean).join(' ');
+---
+
+{embed && attributes && mode === 'direct' && (
+  <figure
+    class={classes('marvin-embed', `marvin-embed--${kind}`, className)}
+    data-provider={embed.provider}
+    style={sizeStyle()}
+  >
+    <iframe {...attributes} />
+  </figure>
+)}
+
+{embed && attributes && mode !== 'direct' && (
+  <figure
+    class={classes('marvin-embed', `marvin-embed--${kind}`, 'marvin-embed--facade', className)}
+    data-provider={embed.provider}
+    style={sizeStyle()}
+  >
+    <button
+      type="button"
+      class="marvin-embed__load"
+      data-marvin-embed-src={attributes.src}
+      data-marvin-embed-attrs={JSON.stringify(attributes)}
+      data-marvin-embed-hosts={JSON.stringify(hosts)}
+    >
+      <span class="marvin-embed__play" aria-hidden="true"></span>
+      <span class="marvin-embed__title">{label}</span>
+      <span class="marvin-embed__consent">{consent}</span>
+    </button>
+    {linkHref && (
+      <a class="marvin-embed__link" href={linkHref} rel="noopener noreferrer">
+        Open on {providerName}
+      </a>
+    )}
+  </figure>
+)}
+
+{embed && !attributes && <LinkCard embed={embed} class={className} />}

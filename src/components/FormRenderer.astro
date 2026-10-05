@@ -1,0 +1,188 @@
+---
+/**
+ * FormRenderer — render a public form from a submittable entry type's field schema.
+ *
+ * A submittable entry type IS a form; its `schema_json.fields` ARE the form fields. Fetch the
+ * definition from the Marvin publishing API at build time — `GET /publish/{ws}/forms/{slug}`
+ * returns `{ formSchema: { fields }, metadata: { successMessage, honeypotField } }` — and pass it
+ * here. The form then renders from the same schema the submission validates against, so a form no
+ * longer has to be hand-coded per page or per site.
+ *
+ * Intentionally UNSTYLED (semantic markup + `data-*` hooks) so the consuming site owns the look;
+ * the only inline style is the visually-hidden honeypot trap.
+ */
+export interface FormFieldSchema {
+  key: string;
+  label: string;
+  /** text | textarea | select | number | boolean | date | datetime (others render as text). */
+  type: string;
+  required?: boolean;
+  placeholder?: string;
+  helpText?: string;
+  defaultValue?: unknown;
+  options?: string[]; // select
+  rows?: number; // textarea
+  min?: number;
+  max?: number;
+  step?: number;
+  pattern?: string; // text
+  format?: string; // 'email' | 'tel' | 'url' — hints the input type
+}
+
+export interface Props {
+  /** The entry type's field schema (`formSchema` from the publishing API). */
+  schema: { fields: FormFieldSchema[] } | null | undefined;
+  /** Where the form POSTs, e.g. `/api/forms/inquiry`. */
+  action: string;
+  /** Hidden anti-spam field name; omit to skip the honeypot. */
+  honeypotField?: string;
+  /** Message shown after a successful (JS) submit. */
+  successMessage?: string;
+  /** Submit button label. */
+  submitLabel?: string;
+  class?: string;
+}
+
+const {
+  schema,
+  action,
+  honeypotField,
+  successMessage = 'Thank you for your submission.',
+  submitLabel = 'Send',
+  class: className,
+} = Astro.props;
+
+const fields = schema?.fields ?? [];
+
+// A text field's input type — inferred from an explicit format hint or the field key.
+function textInputType(f: FormFieldSchema): string {
+  if (f.format === 'email' || f.key === 'email') return 'email';
+  if (f.format === 'tel' || /phone|tel/i.test(f.key)) return 'tel';
+  if (f.format === 'url' || f.key === 'url') return 'url';
+  return 'text';
+}
+---
+
+{fields.length > 0 && (
+  <form
+    method="post"
+    action={action}
+    data-marvin-form
+    data-success={successMessage}
+    class={className}
+  >
+    {honeypotField && (
+      <input
+        type="text"
+        name={honeypotField}
+        tabindex="-1"
+        autocomplete="off"
+        aria-hidden="true"
+        style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0"
+      />
+    )}
+
+    {fields.map((f) => (
+      <div class="marvin-field" data-field-type={f.type}>
+        {f.type !== 'boolean' && (
+          <label for={`mf-${f.key}`}>
+            {f.label}
+            {f.required && <span aria-hidden="true"> *</span>}
+          </label>
+        )}
+
+        {(f.type === 'text' || f.type === 'number' || f.type === 'date' || f.type === 'datetime') && (
+          <input
+            id={`mf-${f.key}`}
+            name={f.key}
+            type={
+              f.type === 'number'
+                ? 'number'
+                : f.type === 'date'
+                  ? 'date'
+                  : f.type === 'datetime'
+                    ? 'datetime-local'
+                    : textInputType(f)
+            }
+            required={f.required}
+            placeholder={f.placeholder}
+            value={f.defaultValue as string | undefined}
+            min={f.min}
+            max={f.max}
+            step={f.step}
+            pattern={f.pattern}
+          />
+        )}
+
+        {f.type === 'textarea' && (
+          <textarea id={`mf-${f.key}`} name={f.key} required={f.required} placeholder={f.placeholder} rows={f.rows ?? 4}>
+            {f.defaultValue as string | undefined}
+          </textarea>
+        )}
+
+        {f.type === 'select' && (
+          <select id={`mf-${f.key}`} name={f.key} required={f.required}>
+            {!f.required && <option value="">{f.placeholder ?? 'Select…'}</option>}
+            {(f.options ?? []).map((o) => (
+              <option value={o} selected={f.defaultValue === o}>
+                {o}
+              </option>
+            ))}
+          </select>
+        )}
+
+        {f.type === 'boolean' && (
+          <label class="marvin-check" for={`mf-${f.key}`}>
+            <input id={`mf-${f.key}`} name={f.key} type="checkbox" value="true" required={f.required} />
+            <span>{f.label}</span>
+          </label>
+        )}
+
+        {f.helpText && <p class="marvin-help">{f.helpText}</p>}
+      </div>
+    ))}
+
+    <button type="submit">{submitLabel}</button>
+    <p data-marvin-status role="status" aria-live="polite" hidden></p>
+  </form>
+)}
+
+<script>
+  // Progressive enhancement: submit via fetch and show a status message. The native POST is the
+  // no-JS fallback, so the form works either way.
+  const forms = document.querySelectorAll<HTMLFormElement>('form[data-marvin-form]');
+  for (const form of forms) {
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const status = form.querySelector<HTMLElement>('[data-marvin-status]');
+      const button = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+      const data: Record<string, unknown> = {};
+      for (const [key, value] of new FormData(form).entries()) {
+        data[key] = value;
+      }
+      if (button) button.disabled = true;
+      try {
+        const res = await fetch(form.action, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify(data),
+        });
+        const body = await res.json().catch(() => ({ success: res.ok }));
+        if (status) {
+          status.hidden = false;
+          status.textContent = body.success
+            ? form.dataset.success || 'Thank you.'
+            : body.message || 'Something went wrong. Please try again.';
+        }
+        if (body.success) form.reset();
+      } catch {
+        if (status) {
+          status.hidden = false;
+          status.textContent = 'Could not send just now — please try again.';
+        }
+      } finally {
+        if (button) button.disabled = false;
+      }
+    });
+  }
+</script>

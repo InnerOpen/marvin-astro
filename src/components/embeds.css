@@ -1,0 +1,125 @@
+/*
+ * Base styles for Marvin media embeds.
+ *
+ * Every selector is wrapped in :where() so it carries zero specificity: any site rule wins.
+ * Theme through the custom properties below rather than overriding the rules.
+ *
+ *   --marvin-embed-aspect      aspect ratio of a player (video default 16 / 9)
+ *   --marvin-embed-height      fixed player height (audio/podcast default 152px)
+ *   --marvin-embed-max-width   max width of an embed (default 100%)
+ *   --marvin-embed-margin      outer margin (default 1.5em 0)
+ *   --marvin-embed-radius      corner radius (default 0.5rem)
+ *   --marvin-embed-bg          facade background (default #111)
+ *   --marvin-embed-fg          facade text colour (default #fff)
+ *   --marvin-embed-muted       secondary text (default currentColor at 70%)
+ *   --marvin-embed-border      link-card border (default 1px solid currentColor at 20%)
+ *   --marvin-embed-focus       focus ring colour (default Highlight)
+ *
+ * Marvin sets --marvin-embed-aspect / --marvin-embed-height on the figure when it knows them.
+ */
+
+:where(.marvin-embed) {
+  display: block;
+  max-width: var(--marvin-embed-max-width, 100%);
+  margin: var(--marvin-embed-margin, 1.5em 0);
+  padding: 0;
+}
+
+:where(.marvin-embed--audio, .marvin-embed--podcast) {
+  --marvin-embed-height: 152px;
+}
+
+/* The player, and the facade button standing in for it, share one box. */
+:where(.marvin-embed) :where(iframe, .marvin-embed__load) {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  height: var(--marvin-embed-height, auto);
+  aspect-ratio: var(--marvin-embed-aspect, 16 / 9);
+  border: 0;
+  border-radius: var(--marvin-embed-radius, 0.5rem);
+}
+
+/* Facade */
+:where(.marvin-embed__load) {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+  padding: 1em;
+  background: var(--marvin-embed-bg, #111);
+  color: var(--marvin-embed-fg, #fff);
+  font: inherit;
+  text-align: center;
+  cursor: pointer;
+}
+
+:where(.marvin-embed__load):focus-visible {
+  outline: 3px solid var(--marvin-embed-focus, Highlight);
+  outline-offset: 2px;
+}
+
+:where(.marvin-embed__load):disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+:where(.marvin-embed__play) {
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0.75em 0 0.75em 1.25em;
+  border-color: transparent transparent transparent currentColor;
+}
+
+:where(.marvin-embed__title) {
+  font-weight: 600;
+}
+
+:where(.marvin-embed__consent) {
+  font-size: 0.85em;
+  opacity: 0.8;
+}
+
+/* A facade sized by height (audio) has little room: keep it on one line. */
+:where(.marvin-embed--audio, .marvin-embed--podcast) :where(.marvin-embed__load) {
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+:where(.marvin-embed__link) {
+  display: inline-block;
+  margin-top: 0.5em;
+  font-size: 0.85em;
+  color: var(--marvin-embed-muted, inherit);
+}
+
+/* Link card (status link / unavailable) */
+:where(.marvin-embed-link) {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25em;
+  max-width: var(--marvin-embed-max-width, 100%);
+  margin: var(--marvin-embed-margin, 1.5em 0);
+  padding: 0.75em 1em;
+  border: var(--marvin-embed-border, 1px solid color-mix(in srgb, currentColor 20%, transparent));
+  border-radius: var(--marvin-embed-radius, 0.5rem);
+  color: inherit;
+  text-decoration: none;
+}
+
+:where(.marvin-embed-link):focus-visible {
+  outline: 3px solid var(--marvin-embed-focus, Highlight);
+  outline-offset: 2px;
+}
+
+:where(.marvin-embed-link__title) {
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+:where(.marvin-embed-link__provider) {
+  font-size: 0.85em;
+  color: var(--marvin-embed-muted, color-mix(in srgb, currentColor 70%, transparent));
+}

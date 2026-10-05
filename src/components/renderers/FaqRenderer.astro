@@ -1,0 +1,26 @@
+---
+import type { RendererEntry } from '../../renderers/types.js';
+
+interface Props {
+  entry: RendererEntry;
+  config?: Record<string, unknown>;
+  class?: string;
+}
+
+const { entry, config, class: className } = Astro.props;
+
+const typeSlug = entry.entryTypeInfo?.slug ?? 'faq';
+---
+
+<section
+  data-renderer="faq"
+  data-entry-type={typeSlug}
+  class={className}
+>
+  <h2 data-role="title">{entry.title}</h2>
+  {entry.summary && (
+    <p data-role="summary">{entry.summary}</p>
+  )}
+
+  <slot />
+</section>

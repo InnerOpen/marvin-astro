@@ -1,9 +1,10 @@
 /**
  * `@inneropen/marvin-astro` — site integration for Marvin CMS.
  *
- * Sits above `@inneropen/marvin-sdk` (transport) and beside `@inneropen/marvin-renderers-core`
- * (entry-type → component mapping). This layer is the part every Marvin-backed site rewrites:
- * repositories with a static fallback, site chrome from collections, and payload normalization.
+ * Sits above `@inneropen/marvin-sdk` (transport). This layer is the part every Marvin-backed site
+ * rewrites: repositories with a static fallback, site chrome from collections, and payload
+ * normalization. Astro components (forms, media embeds, entry-type renderers) live under
+ * `@inneropen/marvin-astro/components`.
  *
  * ```ts
  * // src/lib/content.ts

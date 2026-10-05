@@ -1,0 +1,40 @@
+---
+import type { Entry } from '@inneropen/marvin-sdk';
+import type { RendererEntry, RendererRegistry } from '../renderers/types.js';
+import { resolveRendererConfig, resolveRendererName, resolveRendererRequirement, shouldRenderEntry } from '../renderers/resolve.js';
+import { astroRegistry } from './registry.js';
+import { isCoreRendererPackage, resolveRenderer } from '../renderers/registry.js';
+import { debug } from '../renderers/debug.js';
+
+interface Props {
+  entry?: RendererEntry | Entry;
+  config?: Record<string, unknown>;
+  class?: string;
+  registry?: RendererRegistry | Record<string, unknown>;
+}
+
+const { entry, config: configOverrides, class: className, registry: customRegistry } = Astro.props;
+const rendererEntry = typeof (entry as any)?.toJSON === 'function'
+  ? (entry as Entry).toJSON() as RendererEntry
+  : entry as RendererEntry | undefined;
+
+const rendererRequirement = rendererEntry ? resolveRendererRequirement(rendererEntry) : undefined;
+const rendererPackage = rendererRequirement?.packageName;
+const rendererName = rendererEntry ? resolveRendererName(rendererEntry) : undefined;
+const Renderer = isCoreRendererPackage(rendererPackage) && rendererName
+  // The fallback is the core registry itself; passing a component here (as before) looked up
+  // `component[name]` and never rendered anything.
+  ? resolveRenderer(rendererName, customRegistry, astroRegistry)
+  : undefined;
+const canRender = rendererEntry ? shouldRenderEntry(rendererEntry, rendererName) : true;
+const config = rendererEntry ? resolveRendererConfig(rendererEntry, configOverrides) : {};
+debug('EntryRenderer', { slug: rendererEntry?.slug, renderer: rendererName, package: rendererPackage, hasComponent: !!Renderer, canRender });
+---
+
+{rendererEntry && Renderer && canRender ? (
+  <Renderer entry={rendererEntry} config={config} class={className}>
+    <slot />
+  </Renderer>
+) : (
+  <slot />
+)}

@@ -1,0 +1,27 @@
+---
+import type { RendererEntry } from '../../renderers/types.js';
+import { extractField } from '../../renderers/resolve.js';
+
+interface Props {
+  entry: RendererEntry;
+  config?: Record<string, unknown>;
+  class?: string;
+}
+
+const { entry, config, class: className } = Astro.props;
+
+const href = extractField<string>(entry, 'href') ?? '#';
+const openInNewTab = extractField<boolean>(entry, 'openInNewTab') ?? false;
+const typeSlug = entry.entryTypeInfo?.slug ?? 'navigation-item';
+---
+
+<a
+  data-renderer="navigation"
+  data-entry-type={typeSlug}
+  class={className}
+  href={href}
+  {...openInNewTab ? { target: '_blank', rel: 'noopener noreferrer' } : {}}
+>
+  {entry.title}
+  <slot />
+</a>

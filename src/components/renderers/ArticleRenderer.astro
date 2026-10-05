@@ -1,0 +1,56 @@
+---
+import type { RendererEntry } from '../../renderers/types.js';
+import { extractBody, getFeaturedAsset } from '../../renderers/resolve.js';
+import { entryEmbeds } from '../../embeds.js';
+import type { MarkdownRenderer } from '../../markdown.js';
+import { defaultRenderMarkdown } from '../markdown.js';
+
+interface Props {
+  entry: RendererEntry;
+  config?: Record<string, unknown>;
+  class?: string;
+  /** The site's renderer (`marvin.renderMarkdown`) so its markdown options apply. */
+  renderMarkdown?: MarkdownRenderer;
+}
+
+const { entry, config, class: className, renderMarkdown = defaultRenderMarkdown } = Astro.props;
+
+// The body is markdown: render it (with the entry's media embeds) rather than inject it raw.
+const source = extractBody(entry);
+const body = source ? await renderMarkdown(source, { embeds: entryEmbeds(entry) }) : undefined;
+const featuredAsset = getFeaturedAsset(entry);
+const typeSlug = entry.entryTypeInfo?.slug ?? 'article';
+---
+
+<article
+  data-renderer="article"
+  data-entry-type={typeSlug}
+  class={className}
+>
+  {featuredAsset?.publicUrl && (
+    <figure data-role="featured-asset">
+      <img
+        src={featuredAsset.publicUrl}
+        alt={featuredAsset.altText ?? entry.title}
+        width={featuredAsset.width}
+        height={featuredAsset.height}
+      />
+    </figure>
+  )}
+
+  <header data-role="header">
+    <h1 data-role="title">{entry.title}</h1>
+    {entry.summary && <p data-role="summary">{entry.summary}</p>}
+    {entry.publishedAt && (
+      <time data-role="published-at" datetime={entry.publishedAt}>
+        {new Date(entry.publishedAt).toLocaleDateString()}
+      </time>
+    )}
+  </header>
+
+  {body && (
+    <div data-role="body" set:html={body} />
+  )}
+
+  <slot />
+</article>

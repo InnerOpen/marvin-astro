@@ -12,12 +12,20 @@
       "types": "./dist/types.d.ts",
       "import": "./dist/types.js"
     },
+    "./renderers": {
+      "types": "./dist/renderers/index.d.ts",
+      "import": "./dist/renderers/index.js"
+    },
     "./astro": "./src/astro/index.ts",
-    "./astro/*": "./src/astro/*"
+    "./astro/*": "./src/astro/*",
+    "./components": "./src/components/index.ts",
+    "./components/registry": "./src/components/registry.ts",
+    "./components/integration": "./src/components/integration.ts",
+    "./components/*": "./src/components/*"
   },
   "files": [
     "dist",
-    "src/astro"
+    "src"
   ],
   "scripts": {
     "build": "tsup",
