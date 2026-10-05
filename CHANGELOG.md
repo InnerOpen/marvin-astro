@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/InnerOpen/marvin-astro/compare/v1.2.0...v1.2.1) (2026-10-05)
+
+
+### Bug Fixes
+
+* hydrate list items that carry data; bySlug serves only full entries ([e591146](https://github.com/InnerOpen/marvin-astro/commit/e5911468971c6d8e1e7b35c4ad0556907c318459))
+
 # [1.2.0](https://github.com/InnerOpen/marvin-astro/compare/v1.1.1...v1.2.0) (2026-10-05)
 
 
