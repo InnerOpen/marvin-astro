@@ -35,8 +35,9 @@ describe('Embed', () => {
     expect(html).not.toContain('<iframe');
     expect(html).toContain('<button type="button" class="marvin-embed__load"');
     expect(html).toContain('Never Gonna Give You Up');
-    expect(html).toContain('Loads content from YouTube.');
-    expect(html).toContain('--marvin-embed-aspect: 16/9');
+    expect(html).toContain('Loading this player connects to YouTube, which may set cookies.');
+    expect(html).toContain('<span class="marvin-embed__provider">YouTube</span>');
+    expect(html).toContain('--marvin-embed-aspect:16/9');
     expect(JSON.parse(attr(html, 'data-marvin-embed-hosts')!)).toEqual(['www.youtube-nocookie.com']);
     expect(JSON.parse(attr(html, 'data-marvin-embed-attrs')!)).toMatchObject({
       src: 'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ',
@@ -56,7 +57,7 @@ describe('Embed', () => {
     expect(html).not.toContain('marvin-embed--facade');
   });
 
-  it('uses the consent text with the provider filled in, and frame sources as hosts', async () => {
+  it('uses the consent text with the provider filled in; hosts stay the iframe’s own', async () => {
     const html = await render(Embed, {
       embed: youtubeEmbed(),
       consentText: 'Plays from {provider}; their cookies apply.',
@@ -64,10 +65,7 @@ describe('Embed', () => {
     });
 
     expect(html).toContain('Plays from YouTube; their cookies apply.');
-    expect(JSON.parse(attr(html, 'data-marvin-embed-hosts')!)).toEqual([
-      'https://www.youtube-nocookie.com',
-      'https://player.vimeo.com',
-    ]);
+    expect(JSON.parse(attr(html, 'data-marvin-embed-hosts')!)).toEqual(['www.youtube-nocookie.com']);
   });
 
   it('falls back to a link card when the iframe host is outside the frame sources', async () => {
@@ -86,9 +84,22 @@ describe('Embed', () => {
       const html = await render(Embed, { embed: youtubeEmbed({ status, iframe: null }) });
       expect(html, status).toContain('class="marvin-embed-link"');
       expect(html, status).toContain('on YouTube');
-      expect(html, status).toContain(`data-status="${status}"`);
       expect(html, status).not.toContain('<iframe');
     }
+  });
+
+  it('link card: "on {Provider}" only with a real title', async () => {
+    const untitled = await render(Embed, {
+      embed: youtubeEmbed({
+        status: 'link',
+        title: null,
+        iframe: null,
+        link: { href: YOUTUBE_URL, title: 'Watch on YouTube', providerName: 'YouTube' },
+      }),
+    });
+
+    expect(untitled).toContain('<span class="marvin-embed-link__title">Watch on YouTube</span>');
+    expect(untitled).not.toContain('marvin-embed-link__provider');
   });
 
   it('sizes audio by height', async () => {
@@ -101,7 +112,7 @@ describe('Embed', () => {
     });
 
     expect(html).toContain('marvin-embed--audio');
-    expect(html).toContain('--marvin-embed-height: 152px');
+    expect(html).toContain('--marvin-embed-height:152px');
   });
 
   it('refuses a non-https iframe src and an injected size', async () => {
@@ -118,6 +129,24 @@ describe('Embed', () => {
 
     expect(html).not.toContain('<iframe');
     expect(html).not.toContain('javascript:');
+    expect(html).not.toContain('evil.example');
+  });
+
+  it('drops a size that is not a plain ratio or pixel height', async () => {
+    const html = await render(Embed, {
+      embed: youtubeEmbed({
+        iframe: {
+          src: 'https://www.youtube-nocookie.com/embed/x',
+          title: 'x',
+          aspectRatio: '16/9;background:url(https://evil.example)',
+          height: null,
+        },
+      }),
+      mode: 'direct',
+    });
+
+    expect(html).toContain('<iframe');
+    expect(html).not.toContain('--marvin-embed-aspect');
     expect(html).not.toContain('evil.example');
   });
 

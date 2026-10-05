@@ -17,17 +17,20 @@ export type MarvinEmbedKind = 'video' | 'audio' | 'podcast' | 'playlist';
 export type MarvinEmbedStatus = 'ok' | 'link' | 'unavailable';
 export type MarvinEmbedMode = 'direct' | 'click_to_load';
 
-/** A Marvin-built iframe. Every value is already allow-listed and escaped server-side. */
+/**
+ * A Marvin-built iframe. Every value comes from Marvin's provider registry. Exactly one of
+ * `aspectRatio` / `height` is set; the other is `null`.
+ */
 export type MarvinEmbedIframe = {
   src: string;
   title: string;
-  allow?: string;
-  sandbox?: string;
-  referrerpolicy?: string;
-  /** CSS aspect ratio for video, e.g. `"16/9"`. */
-  aspectRatio?: string;
-  /** Fixed pixel height for audio players. */
-  height?: number;
+  allow?: string | null;
+  sandbox?: string | null;
+  referrerpolicy?: string | null;
+  /** CSS aspect ratio for video players, e.g. `"16/9"` (`"9/16"` for Shorts); `null` otherwise. */
+  aspectRatio?: string | null;
+  /** Fixed pixel height for audio / podcast / playlist players; `null` for video. */
+  height?: number | null;
 };
 
 /** The plain link every embed falls back to. */
@@ -37,10 +40,11 @@ export type MarvinEmbedLink = {
   providerName: string;
 };
 
+/** Optional fields arrive as `null` rather than omitted; every reader here treats both alike. */
 export type MarvinEmbed = {
   /** The URL exactly as written in the content. */
   url: string;
-  canonicalUrl?: string;
+  canonicalUrl?: string | null;
   /** Provider key, e.g. `youtube`. */
   provider: string;
   /** Display name, e.g. `YouTube`. */
@@ -60,7 +64,10 @@ export type MarvinEmbed = {
 /** `entry.embeds`: every resolved embed on the entry, keyed by the URL as written. */
 export type MarvinEmbeds = Record<string, MarvinEmbed>;
 
-/** `site.embeds`: the site's embed privacy mode and the frame sources a CSP must allow. */
+/**
+ * `site.embeds` (next to `site.seo`): the site's embed privacy mode, consent text (`{provider}`
+ * already substituted per embed in the published `html`) and the frame sources a CSP must allow.
+ */
 export type MarvinSiteEmbeds = {
   mode: MarvinEmbedMode;
   consentText: string;

@@ -1,0 +1,426 @@
+{
+  "site": {
+    "click_to_load": {
+      "mode": "click_to_load",
+      "consentText": "Loading this player connects to {provider}, which may set cookies.",
+      "frameSources": [
+        "https://bandcamp.com",
+        "https://embed.music.apple.com",
+        "https://embed.podcasts.apple.com",
+        "https://embed.tidal.com",
+        "https://open.spotify.com",
+        "https://player.simplecast.com",
+        "https://player.vimeo.com",
+        "https://share.transistor.fm",
+        "https://w.soundcloud.com",
+        "https://www.youtube-nocookie.com"
+      ]
+    },
+    "direct": {
+      "mode": "direct",
+      "consentText": "Loading this player connects to {provider}, which may set cookies.",
+      "frameSources": [
+        "https://bandcamp.com",
+        "https://embed.music.apple.com",
+        "https://embed.podcasts.apple.com",
+        "https://embed.tidal.com",
+        "https://open.spotify.com",
+        "https://player.simplecast.com",
+        "https://player.vimeo.com",
+        "https://share.transistor.fm",
+        "https://w.soundcloud.com",
+        "https://www.youtube-nocookie.com"
+      ]
+    }
+  },
+  "embeds": {
+    "click_to_load": {
+      "youtube": {
+        "url": "https://youtu.be/dQw4w9WgXcQ",
+        "canonicalUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        "provider": "youtube",
+        "providerName": "YouTube",
+        "kind": "video",
+        "status": "ok",
+        "title": "Never Gonna \"Give\" <You> Up",
+        "authorName": "Rick Astley",
+        "thumbnailUrl": null,
+        "iframe": {
+          "src": "https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ",
+          "title": "Never Gonna \"Give\" <You> Up",
+          "allow": "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen",
+          "sandbox": "allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-presentation",
+          "referrerpolicy": "strict-origin-when-cross-origin",
+          "aspectRatio": "16/9",
+          "height": null
+        },
+        "link": {
+          "href": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+          "title": "Never Gonna \"Give\" <You> Up",
+          "providerName": "YouTube"
+        },
+        "html": "<figure class=\"marvin-embed marvin-embed--video marvin-embed--facade\" data-provider=\"youtube\" style=\"--marvin-embed-aspect:16/9\"><button type=\"button\" class=\"marvin-embed__load\" data-marvin-embed-src=\"https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ\" data-marvin-embed-attrs=\"{&quot;src&quot;:&quot;https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ&quot;,&quot;title&quot;:&quot;Never Gonna \\&quot;Give\\&quot; &lt;You&gt; Up&quot;,&quot;allow&quot;:&quot;accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen&quot;,&quot;sandbox&quot;:&quot;allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-presentation&quot;,&quot;referrerpolicy&quot;:&quot;strict-origin-when-cross-origin&quot;,&quot;loading&quot;:&quot;lazy&quot;}\" data-marvin-embed-hosts=\"[&quot;www.youtube-nocookie.com&quot;]\"><span class=\"marvin-embed__provider\">YouTube</span><span class=\"marvin-embed__title\">Never Gonna &quot;Give&quot; &lt;You&gt; Up</span><span class=\"marvin-embed__consent\">Loading this player connects to YouTube, which may set cookies.</span></button><a class=\"marvin-embed__link\" href=\"https://www.youtube.com/watch?v=dQw4w9WgXcQ\" rel=\"noopener noreferrer\">Never Gonna &quot;Give&quot; &lt;You&gt; Up</a></figure>"
+      },
+      "youtube_shorts": {
+        "url": "https://www.youtube.com/shorts/abcDEF12345",
+        "canonicalUrl": "https://www.youtube.com/shorts/abcDEF12345",
+        "provider": "youtube",
+        "providerName": "YouTube",
+        "kind": "video",
+        "status": "ok",
+        "title": null,
+        "authorName": null,
+        "thumbnailUrl": null,
+        "iframe": {
+          "src": "https://www.youtube-nocookie.com/embed/abcDEF12345",
+          "title": "YouTube player",
+          "allow": "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen",
+          "sandbox": "allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-presentation",
+          "referrerpolicy": "strict-origin-when-cross-origin",
+          "aspectRatio": "9/16",
+          "height": null
+        },
+        "link": {
+          "href": "https://www.youtube.com/shorts/abcDEF12345",
+          "title": "Watch on YouTube",
+          "providerName": "YouTube"
+        },
+        "html": "<figure class=\"marvin-embed marvin-embed--video marvin-embed--facade\" data-provider=\"youtube\" style=\"--marvin-embed-aspect:9/16\"><button type=\"button\" class=\"marvin-embed__load\" data-marvin-embed-src=\"https://www.youtube-nocookie.com/embed/abcDEF12345\" data-marvin-embed-attrs=\"{&quot;src&quot;:&quot;https://www.youtube-nocookie.com/embed/abcDEF12345&quot;,&quot;title&quot;:&quot;YouTube player&quot;,&quot;allow&quot;:&quot;accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen&quot;,&quot;sandbox&quot;:&quot;allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-presentation&quot;,&quot;referrerpolicy&quot;:&quot;strict-origin-when-cross-origin&quot;,&quot;loading&quot;:&quot;lazy&quot;}\" data-marvin-embed-hosts=\"[&quot;www.youtube-nocookie.com&quot;]\"><span class=\"marvin-embed__provider\">YouTube</span><span class=\"marvin-embed__title\">Watch on YouTube</span><span class=\"marvin-embed__consent\">Loading this player connects to YouTube, which may set cookies.</span></button><a class=\"marvin-embed__link\" href=\"https://www.youtube.com/shorts/abcDEF12345\" rel=\"noopener noreferrer\">Watch on YouTube</a></figure>"
+      },
+      "vimeo": {
+        "url": "https://vimeo.com/76979871",
+        "canonicalUrl": "https://vimeo.com/76979871",
+        "provider": "vimeo",
+        "providerName": "Vimeo",
+        "kind": "video",
+        "status": "ok",
+        "title": null,
+        "authorName": null,
+        "thumbnailUrl": null,
+        "iframe": {
+          "src": "https://player.vimeo.com/video/76979871?dnt=1",
+          "title": "Vimeo player",
+          "allow": "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen",
+          "sandbox": "allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-presentation",
+          "referrerpolicy": "strict-origin-when-cross-origin",
+          "aspectRatio": "16/9",
+          "height": null
+        },
+        "link": {
+          "href": "https://vimeo.com/76979871",
+          "title": "Watch on Vimeo",
+          "providerName": "Vimeo"
+        },
+        "html": "<figure class=\"marvin-embed marvin-embed--video marvin-embed--facade\" data-provider=\"vimeo\" style=\"--marvin-embed-aspect:16/9\"><button type=\"button\" class=\"marvin-embed__load\" data-marvin-embed-src=\"https://player.vimeo.com/video/76979871?dnt=1\" data-marvin-embed-attrs=\"{&quot;src&quot;:&quot;https://player.vimeo.com/video/76979871?dnt=1&quot;,&quot;title&quot;:&quot;Vimeo player&quot;,&quot;allow&quot;:&quot;accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen&quot;,&quot;sandbox&quot;:&quot;allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-presentation&quot;,&quot;referrerpolicy&quot;:&quot;strict-origin-when-cross-origin&quot;,&quot;loading&quot;:&quot;lazy&quot;}\" data-marvin-embed-hosts=\"[&quot;player.vimeo.com&quot;]\"><span class=\"marvin-embed__provider\">Vimeo</span><span class=\"marvin-embed__title\">Watch on Vimeo</span><span class=\"marvin-embed__consent\">Loading this player connects to Vimeo, which may set cookies.</span></button><a class=\"marvin-embed__link\" href=\"https://vimeo.com/76979871\" rel=\"noopener noreferrer\">Watch on Vimeo</a></figure>"
+      },
+      "spotify_track": {
+        "url": "https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT",
+        "canonicalUrl": "https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT",
+        "provider": "spotify",
+        "providerName": "Spotify",
+        "kind": "audio",
+        "status": "ok",
+        "title": "A Track",
+        "authorName": null,
+        "thumbnailUrl": null,
+        "iframe": {
+          "src": "https://open.spotify.com/embed/track/4cOdK2wGLETKBW3PvgPWqT",
+          "title": "A Track",
+          "allow": "autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture",
+          "sandbox": "allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-presentation",
+          "referrerpolicy": "strict-origin-when-cross-origin",
+          "aspectRatio": null,
+          "height": 152
+        },
+        "link": {
+          "href": "https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT",
+          "title": "A Track",
+          "providerName": "Spotify"
+        },
+        "html": "<figure class=\"marvin-embed marvin-embed--audio marvin-embed--facade\" data-provider=\"spotify\" style=\"--marvin-embed-height:152px\"><button type=\"button\" class=\"marvin-embed__load\" data-marvin-embed-src=\"https://open.spotify.com/embed/track/4cOdK2wGLETKBW3PvgPWqT\" data-marvin-embed-attrs=\"{&quot;src&quot;:&quot;https://open.spotify.com/embed/track/4cOdK2wGLETKBW3PvgPWqT&quot;,&quot;title&quot;:&quot;A Track&quot;,&quot;allow&quot;:&quot;autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture&quot;,&quot;sandbox&quot;:&quot;allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-presentation&quot;,&quot;referrerpolicy&quot;:&quot;strict-origin-when-cross-origin&quot;,&quot;loading&quot;:&quot;lazy&quot;}\" data-marvin-embed-hosts=\"[&quot;open.spotify.com&quot;]\"><span class=\"marvin-embed__provider\">Spotify</span><span class=\"marvin-embed__title\">A Track</span><span class=\"marvin-embed__consent\">Loading this player connects to Spotify, which may set cookies.</span></button><a class=\"marvin-embed__link\" href=\"https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT\" rel=\"noopener noreferrer\">A Track</a></figure>"
+      },
+      "spotify_playlist": {
+        "url": "https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M",
+        "canonicalUrl": "https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M",
+        "provider": "spotify",
+        "providerName": "Spotify",
+        "kind": "playlist",
+        "status": "ok",
+        "title": null,
+        "authorName": null,
+        "thumbnailUrl": null,
+        "iframe": {
+          "src": "https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M",
+          "title": "Spotify player",
+          "allow": "autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture",
+          "sandbox": "allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-presentation",
+          "referrerpolicy": "strict-origin-when-cross-origin",
+          "aspectRatio": null,
+          "height": 352
+        },
+        "link": {
+          "href": "https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M",
+          "title": "Listen on Spotify",
+          "providerName": "Spotify"
+        },
+        "html": "<figure class=\"marvin-embed marvin-embed--playlist marvin-embed--facade\" data-provider=\"spotify\" style=\"--marvin-embed-height:352px\"><button type=\"button\" class=\"marvin-embed__load\" data-marvin-embed-src=\"https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M\" data-marvin-embed-attrs=\"{&quot;src&quot;:&quot;https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M&quot;,&quot;title&quot;:&quot;Spotify player&quot;,&quot;allow&quot;:&quot;autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture&quot;,&quot;sandbox&quot;:&quot;allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-presentation&quot;,&quot;referrerpolicy&quot;:&quot;strict-origin-when-cross-origin&quot;,&quot;loading&quot;:&quot;lazy&quot;}\" data-marvin-embed-hosts=\"[&quot;open.spotify.com&quot;]\"><span class=\"marvin-embed__provider\">Spotify</span><span class=\"marvin-embed__title\">Listen on Spotify</span><span class=\"marvin-embed__consent\">Loading this player connects to Spotify, which may set cookies.</span></button><a class=\"marvin-embed__link\" href=\"https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M\" rel=\"noopener noreferrer\">Listen on Spotify</a></figure>"
+      },
+      "spotify_episode": {
+        "url": "https://open.spotify.com/episode/7makk4oTQel546B0PZlDM5",
+        "canonicalUrl": "https://open.spotify.com/episode/7makk4oTQel546B0PZlDM5",
+        "provider": "spotify",
+        "providerName": "Spotify",
+        "kind": "podcast",
+        "status": "ok",
+        "title": null,
+        "authorName": null,
+        "thumbnailUrl": null,
+        "iframe": {
+          "src": "https://open.spotify.com/embed/episode/7makk4oTQel546B0PZlDM5",
+          "title": "Spotify player",
+          "allow": "autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture",
+          "sandbox": "allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-presentation",
+          "referrerpolicy": "strict-origin-when-cross-origin",
+          "aspectRatio": null,
+          "height": 152
+        },
+        "link": {
+          "href": "https://open.spotify.com/episode/7makk4oTQel546B0PZlDM5",
+          "title": "Listen on Spotify",
+          "providerName": "Spotify"
+        },
+        "html": "<figure class=\"marvin-embed marvin-embed--podcast marvin-embed--facade\" data-provider=\"spotify\" style=\"--marvin-embed-height:152px\"><button type=\"button\" class=\"marvin-embed__load\" data-marvin-embed-src=\"https://open.spotify.com/embed/episode/7makk4oTQel546B0PZlDM5\" data-marvin-embed-attrs=\"{&quot;src&quot;:&quot;https://open.spotify.com/embed/episode/7makk4oTQel546B0PZlDM5&quot;,&quot;title&quot;:&quot;Spotify player&quot;,&quot;allow&quot;:&quot;autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture&quot;,&quot;sandbox&quot;:&quot;allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-presentation&quot;,&quot;referrerpolicy&quot;:&quot;strict-origin-when-cross-origin&quot;,&quot;loading&quot;:&quot;lazy&quot;}\" data-marvin-embed-hosts=\"[&quot;open.spotify.com&quot;]\"><span class=\"marvin-embed__provider\">Spotify</span><span class=\"marvin-embed__title\">Listen on Spotify</span><span class=\"marvin-embed__consent\">Loading this player connects to Spotify, which may set cookies.</span></button><a class=\"marvin-embed__link\" href=\"https://open.spotify.com/episode/7makk4oTQel546B0PZlDM5\" rel=\"noopener noreferrer\">Listen on Spotify</a></figure>"
+      },
+      "youtube_unavailable": {
+        "url": "https://www.youtube.com/watch?v=xxxxxxxxxxx",
+        "canonicalUrl": "https://www.youtube.com/watch?v=xxxxxxxxxxx",
+        "provider": "youtube",
+        "providerName": "YouTube",
+        "kind": "video",
+        "status": "unavailable",
+        "title": "Removed video",
+        "authorName": null,
+        "thumbnailUrl": null,
+        "iframe": null,
+        "link": {
+          "href": "https://www.youtube.com/watch?v=xxxxxxxxxxx",
+          "title": "Removed video",
+          "providerName": "YouTube"
+        },
+        "html": "<a class=\"marvin-embed-link\" href=\"https://www.youtube.com/watch?v=xxxxxxxxxxx\" rel=\"noopener noreferrer\" data-provider=\"youtube\"><span class=\"marvin-embed-link__title\">Removed video</span> <span class=\"marvin-embed-link__provider\">on YouTube</span></a>"
+      },
+      "bandcamp_link": {
+        "url": "https://artist.bandcamp.com/album/some-album",
+        "canonicalUrl": "https://artist.bandcamp.com/album/some-album",
+        "provider": "bandcamp",
+        "providerName": "Bandcamp",
+        "kind": "playlist",
+        "status": "link",
+        "title": null,
+        "authorName": null,
+        "thumbnailUrl": null,
+        "iframe": null,
+        "link": {
+          "href": "https://artist.bandcamp.com/album/some-album",
+          "title": "Listen on Bandcamp",
+          "providerName": "Bandcamp"
+        },
+        "html": "<a class=\"marvin-embed-link\" href=\"https://artist.bandcamp.com/album/some-album\" rel=\"noopener noreferrer\" data-provider=\"bandcamp\"><span class=\"marvin-embed-link__title\">Listen on Bandcamp</span></a>"
+      }
+    },
+    "direct": {
+      "youtube": {
+        "url": "https://youtu.be/dQw4w9WgXcQ",
+        "canonicalUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        "provider": "youtube",
+        "providerName": "YouTube",
+        "kind": "video",
+        "status": "ok",
+        "title": "Never Gonna \"Give\" <You> Up",
+        "authorName": "Rick Astley",
+        "thumbnailUrl": null,
+        "iframe": {
+          "src": "https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ",
+          "title": "Never Gonna \"Give\" <You> Up",
+          "allow": "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen",
+          "sandbox": "allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-presentation",
+          "referrerpolicy": "strict-origin-when-cross-origin",
+          "aspectRatio": "16/9",
+          "height": null
+        },
+        "link": {
+          "href": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+          "title": "Never Gonna \"Give\" <You> Up",
+          "providerName": "YouTube"
+        },
+        "html": "<figure class=\"marvin-embed marvin-embed--video\" data-provider=\"youtube\" style=\"--marvin-embed-aspect:16/9\"><iframe src=\"https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ\" title=\"Never Gonna &quot;Give&quot; &lt;You&gt; Up\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen\" sandbox=\"allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-presentation\" referrerpolicy=\"strict-origin-when-cross-origin\" loading=\"lazy\"></iframe></figure>"
+      },
+      "youtube_shorts": {
+        "url": "https://www.youtube.com/shorts/abcDEF12345",
+        "canonicalUrl": "https://www.youtube.com/shorts/abcDEF12345",
+        "provider": "youtube",
+        "providerName": "YouTube",
+        "kind": "video",
+        "status": "ok",
+        "title": null,
+        "authorName": null,
+        "thumbnailUrl": null,
+        "iframe": {
+          "src": "https://www.youtube-nocookie.com/embed/abcDEF12345",
+          "title": "YouTube player",
+          "allow": "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen",
+          "sandbox": "allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-presentation",
+          "referrerpolicy": "strict-origin-when-cross-origin",
+          "aspectRatio": "9/16",
+          "height": null
+        },
+        "link": {
+          "href": "https://www.youtube.com/shorts/abcDEF12345",
+          "title": "Watch on YouTube",
+          "providerName": "YouTube"
+        },
+        "html": "<figure class=\"marvin-embed marvin-embed--video\" data-provider=\"youtube\" style=\"--marvin-embed-aspect:9/16\"><iframe src=\"https://www.youtube-nocookie.com/embed/abcDEF12345\" title=\"YouTube player\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen\" sandbox=\"allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-presentation\" referrerpolicy=\"strict-origin-when-cross-origin\" loading=\"lazy\"></iframe></figure>"
+      },
+      "vimeo": {
+        "url": "https://vimeo.com/76979871",
+        "canonicalUrl": "https://vimeo.com/76979871",
+        "provider": "vimeo",
+        "providerName": "Vimeo",
+        "kind": "video",
+        "status": "ok",
+        "title": null,
+        "authorName": null,
+        "thumbnailUrl": null,
+        "iframe": {
+          "src": "https://player.vimeo.com/video/76979871?dnt=1",
+          "title": "Vimeo player",
+          "allow": "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen",
+          "sandbox": "allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-presentation",
+          "referrerpolicy": "strict-origin-when-cross-origin",
+          "aspectRatio": "16/9",
+          "height": null
+        },
+        "link": {
+          "href": "https://vimeo.com/76979871",
+          "title": "Watch on Vimeo",
+          "providerName": "Vimeo"
+        },
+        "html": "<figure class=\"marvin-embed marvin-embed--video\" data-provider=\"vimeo\" style=\"--marvin-embed-aspect:16/9\"><iframe src=\"https://player.vimeo.com/video/76979871?dnt=1\" title=\"Vimeo player\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen\" sandbox=\"allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-presentation\" referrerpolicy=\"strict-origin-when-cross-origin\" loading=\"lazy\"></iframe></figure>"
+      },
+      "spotify_track": {
+        "url": "https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT",
+        "canonicalUrl": "https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT",
+        "provider": "spotify",
+        "providerName": "Spotify",
+        "kind": "audio",
+        "status": "ok",
+        "title": "A Track",
+        "authorName": null,
+        "thumbnailUrl": null,
+        "iframe": {
+          "src": "https://open.spotify.com/embed/track/4cOdK2wGLETKBW3PvgPWqT",
+          "title": "A Track",
+          "allow": "autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture",
+          "sandbox": "allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-presentation",
+          "referrerpolicy": "strict-origin-when-cross-origin",
+          "aspectRatio": null,
+          "height": 152
+        },
+        "link": {
+          "href": "https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT",
+          "title": "A Track",
+          "providerName": "Spotify"
+        },
+        "html": "<figure class=\"marvin-embed marvin-embed--audio\" data-provider=\"spotify\" style=\"--marvin-embed-height:152px\"><iframe src=\"https://open.spotify.com/embed/track/4cOdK2wGLETKBW3PvgPWqT\" title=\"A Track\" allow=\"autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture\" sandbox=\"allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-presentation\" referrerpolicy=\"strict-origin-when-cross-origin\" loading=\"lazy\"></iframe></figure>"
+      },
+      "spotify_playlist": {
+        "url": "https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M",
+        "canonicalUrl": "https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M",
+        "provider": "spotify",
+        "providerName": "Spotify",
+        "kind": "playlist",
+        "status": "ok",
+        "title": null,
+        "authorName": null,
+        "thumbnailUrl": null,
+        "iframe": {
+          "src": "https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M",
+          "title": "Spotify player",
+          "allow": "autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture",
+          "sandbox": "allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-presentation",
+          "referrerpolicy": "strict-origin-when-cross-origin",
+          "aspectRatio": null,
+          "height": 352
+        },
+        "link": {
+          "href": "https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M",
+          "title": "Listen on Spotify",
+          "providerName": "Spotify"
+        },
+        "html": "<figure class=\"marvin-embed marvin-embed--playlist\" data-provider=\"spotify\" style=\"--marvin-embed-height:352px\"><iframe src=\"https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M\" title=\"Spotify player\" allow=\"autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture\" sandbox=\"allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-presentation\" referrerpolicy=\"strict-origin-when-cross-origin\" loading=\"lazy\"></iframe></figure>"
+      },
+      "spotify_episode": {
+        "url": "https://open.spotify.com/episode/7makk4oTQel546B0PZlDM5",
+        "canonicalUrl": "https://open.spotify.com/episode/7makk4oTQel546B0PZlDM5",
+        "provider": "spotify",
+        "providerName": "Spotify",
+        "kind": "podcast",
+        "status": "ok",
+        "title": null,
+        "authorName": null,
+        "thumbnailUrl": null,
+        "iframe": {
+          "src": "https://open.spotify.com/embed/episode/7makk4oTQel546B0PZlDM5",
+          "title": "Spotify player",
+          "allow": "autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture",
+          "sandbox": "allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-presentation",
+          "referrerpolicy": "strict-origin-when-cross-origin",
+          "aspectRatio": null,
+          "height": 152
+        },
+        "link": {
+          "href": "https://open.spotify.com/episode/7makk4oTQel546B0PZlDM5",
+          "title": "Listen on Spotify",
+          "providerName": "Spotify"
+        },
+        "html": "<figure class=\"marvin-embed marvin-embed--podcast\" data-provider=\"spotify\" style=\"--marvin-embed-height:152px\"><iframe src=\"https://open.spotify.com/embed/episode/7makk4oTQel546B0PZlDM5\" title=\"Spotify player\" allow=\"autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture\" sandbox=\"allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-presentation\" referrerpolicy=\"strict-origin-when-cross-origin\" loading=\"lazy\"></iframe></figure>"
+      },
+      "youtube_unavailable": {
+        "url": "https://www.youtube.com/watch?v=xxxxxxxxxxx",
+        "canonicalUrl": "https://www.youtube.com/watch?v=xxxxxxxxxxx",
+        "provider": "youtube",
+        "providerName": "YouTube",
+        "kind": "video",
+        "status": "unavailable",
+        "title": "Removed video",
+        "authorName": null,
+        "thumbnailUrl": null,
+        "iframe": null,
+        "link": {
+          "href": "https://www.youtube.com/watch?v=xxxxxxxxxxx",
+          "title": "Removed video",
+          "providerName": "YouTube"
+        },
+        "html": "<a class=\"marvin-embed-link\" href=\"https://www.youtube.com/watch?v=xxxxxxxxxxx\" rel=\"noopener noreferrer\" data-provider=\"youtube\"><span class=\"marvin-embed-link__title\">Removed video</span> <span class=\"marvin-embed-link__provider\">on YouTube</span></a>"
+      },
+      "bandcamp_link": {
+        "url": "https://artist.bandcamp.com/album/some-album",
+        "canonicalUrl": "https://artist.bandcamp.com/album/some-album",
+        "provider": "bandcamp",
+        "providerName": "Bandcamp",
+        "kind": "playlist",
+        "status": "link",
+        "title": null,
+        "authorName": null,
+        "thumbnailUrl": null,
+        "iframe": null,
+        "link": {
+          "href": "https://artist.bandcamp.com/album/some-album",
+          "title": "Listen on Bandcamp",
+          "providerName": "Bandcamp"
+        },
+        "html": "<a class=\"marvin-embed-link\" href=\"https://artist.bandcamp.com/album/some-album\" rel=\"noopener noreferrer\" data-provider=\"bandcamp\"><span class=\"marvin-embed-link__title\">Listen on Bandcamp</span></a>"
+      }
+    }
+  }
+}

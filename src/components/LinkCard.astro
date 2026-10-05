@@ -3,24 +3,28 @@
  * LinkCard — the plain-link fallback for an embed that can't (or shouldn't) be framed: a provider
  * Marvin couldn't resolve, a removed video, or a site that doesn't frame anything.
  *
- * Pass an `embed`, or `href`/`title`/`providerName` directly. Only http(s) links render.
+ * Matches Marvin's published link card: the title, plus "on {Provider}" when the title is the
+ * media's real title (without one, the title is already "Watch on YouTube"). Pass an `embed`, or
+ * `href`/`title`/`providerName` directly. Only http(s) links render.
  */
 import type { MarvinEmbed } from '../embeds.js';
 import { safeLinkHref } from './embed-frame.js';
 
 interface Props {
   embed?: MarvinEmbed | null;
-  href?: string;
-  title?: string;
-  providerName?: string;
+  href?: string | null;
+  title?: string | null;
+  providerName?: string | null;
   class?: string;
 }
 
 const { embed, class: className } = Astro.props;
-const href = safeLinkHref(Astro.props.href ?? embed?.link?.href ?? embed?.url);
-const providerName =
-  Astro.props.providerName ?? embed?.link?.providerName ?? embed?.providerName ?? undefined;
-const title = Astro.props.title ?? embed?.link?.title ?? embed?.title ?? href;
+const href = safeLinkHref(
+  Astro.props.href || embed?.link?.href || embed?.canonicalUrl || embed?.url
+);
+const realTitle = Astro.props.title || embed?.title || undefined;
+const title = realTitle || embed?.link?.title || href;
+const providerName = Astro.props.providerName || embed?.link?.providerName || embed?.providerName;
 ---
 
 {href && (
@@ -29,9 +33,10 @@ const title = Astro.props.title ?? embed?.link?.title ?? embed?.title ?? href;
     href={href}
     rel="noopener noreferrer"
     data-provider={embed?.provider}
-    data-status={embed?.status}
   >
     <span class="marvin-embed-link__title">{title}</span>
-    {providerName && <span class="marvin-embed-link__provider">on {providerName}</span>}
+    {realTitle && providerName && (
+      <span class="marvin-embed-link__provider">on {providerName}</span>
+    )}
   </a>
 )}
