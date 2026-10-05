@@ -3,6 +3,7 @@ import { createFieldAccessor } from '../src/fields.js';
 import { createMarkdownRenderer } from '../src/markdown.js';
 import { asEntry, projectRead, referenceRead } from './support/fixtures.js';
 import type { MarvinContentEntry } from '../src/types.js';
+import { FACADE_HTML, YOUTUBE_URL, youtubeEmbed } from './support/embeds.js';
 
 const renderMarkdown = createMarkdownRenderer();
 
@@ -103,6 +104,58 @@ describe('markdown', () => {
     const html = await fieldsOf({ data: {}, contentMarkdown: '# Title' }).markdown('body');
 
     expect(html).toContain('<h1>');
+  });
+});
+
+describe('embeds', () => {
+  const embedded = {
+    data: { body: `Watch this:\n\n${YOUTUBE_URL}`, video: ` ${YOUTUBE_URL} ` },
+    embeds: { [YOUTUBE_URL]: youtubeEmbed() },
+  };
+
+  it('markdown() renders a bare embedded URL with the entry’s embeds', async () => {
+    const html = await fieldsOf(embedded).markdown('body');
+
+    expect(html).toContain(FACADE_HTML);
+    expect(html).toContain('<p>Watch this:</p>');
+  });
+
+  it('markdown() keeps the link when embeds are switched off for the field', async () => {
+    const html = await fieldsOf(embedded).markdown('body', { embeds: false });
+
+    expect(html).not.toContain('marvin-embed');
+    expect(html).toContain(`<a href="${YOUTUBE_URL}">`);
+  });
+
+  it('markdown() reads embeds through the SDK Entry wrapper’s toJSON()', async () => {
+    const wrapped = {
+      field: (key: string) => (embedded.data as Record<string, unknown>)[key],
+      toJSON: () => embedded,
+    };
+
+    expect(await fieldsOf(wrapped).markdown('body')).toContain(FACADE_HTML);
+  });
+
+  it('embed() returns the PublishedEmbed for an embed field', () => {
+    const embed = fieldsOf(embedded).embed('video');
+
+    expect(embed?.provider).toBe('youtube');
+    expect(embed?.iframe?.src).toBe('https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ');
+  });
+
+  it('embed() is undefined for an empty field, an unresolved URL, or no embeds', () => {
+    expect(fieldsOf(embedded).embed('missing')).toBeUndefined();
+    expect(
+      fieldsOf({ ...embedded, data: { video: 'https://vimeo.com/1' } }).embed('video')
+    ).toBeUndefined();
+    expect(fieldsOf({ data: { video: YOUTUBE_URL } }).embed('video')).toBeUndefined();
+  });
+
+  it('embed() ignores a malformed embeds payload', () => {
+    expect(fieldsOf({ data: { video: YOUTUBE_URL }, embeds: [] }).embed('video')).toBeUndefined();
+    expect(
+      fieldsOf({ data: { video: YOUTUBE_URL }, embeds: { [YOUTUBE_URL]: 'nope' } }).embed('video')
+    ).toBeUndefined();
   });
 });
 

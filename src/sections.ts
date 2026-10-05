@@ -1,3 +1,4 @@
+import { entryEmbeds } from './embeds.js';
 import type { MarvinFetcher } from './fetch.js';
 import { createMarkdownRenderer, preserveSoftBreaks, type MarkdownRenderer } from './markdown.js';
 import { asString, assetUrl, entryField, selectAssetByRole } from './normalize.js';
@@ -30,7 +31,9 @@ export async function loadSectionLanding(
 
   return {
     title: asString(entry.title),
-    introHtml: source ? await renderMarkdown(preserveSoftBreaks(source)) : undefined,
+    introHtml: source
+      ? await renderMarkdown(preserveSoftBreaks(source), { embeds: entryEmbeds(entry) })
+      : undefined,
     hero: assetUrl(selectAssetByRole(entry, options.heroRole ?? 'hero')),
   };
 }

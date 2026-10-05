@@ -8,6 +8,7 @@
  */
 
 import type { MarvinSite, SiteConfiguration } from '@inneropen/marvin-sdk';
+import { siteEmbeds } from './embeds.js';
 import type { MarvinFetcher } from './fetch.js';
 import { asRecord, asString, assetUrl } from './normalize.js';
 import type { ApiSeo, ApiSite } from './types.js';
@@ -125,6 +126,10 @@ function transformMarvinSite(marvinSite: MarvinSite, fallback: ApiSite): ApiSite
       canonicalUrl: asString(config.canonicalUrl),
       siteName: title,
     }),
+    // Older servers and SDKs don't send it; `siteEmbeds` returns undefined then.
+    embeds: siteEmbeds(
+      (config as { embeds?: unknown }).embeds ?? (marvinSite as { embeds?: unknown }).embeds
+    ),
     metadata,
   };
 }

@@ -6,6 +6,7 @@
  * use. Nothing here is specific to a particular site's design system.
  */
 
+import type { MarvinSiteEmbeds } from './embeds.js';
 import type {
   CollectionEntry,
   Entry,
@@ -105,6 +106,11 @@ export type ApiSite = {
   imprint?: string;
   social: Record<string, string>;
   seo: ApiSeo;
+  /**
+   * Embed privacy mode, consent text and the frame sources a `frame-src` CSP must allow.
+   * Absent when the server predates media embeds.
+   */
+  embeds?: MarvinSiteEmbeds;
   metadata: Record<string, unknown>;
 };
 
@@ -169,3 +175,14 @@ export type SectionLanding = {
   introHtml?: string;
   hero?: string;
 };
+
+export type {
+  MarvinEmbed,
+  MarvinEmbedIframe,
+  MarvinEmbedKind,
+  MarvinEmbedLink,
+  MarvinEmbedMode,
+  MarvinEmbeds,
+  MarvinEmbedStatus,
+  MarvinSiteEmbeds,
+} from './embeds.js';

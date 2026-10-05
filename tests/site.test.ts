@@ -233,6 +233,37 @@ describe('getSite', () => {
     expect(site.social.instagram).toBe('https://instagram.com/static');
   });
 
+  it('resolves site.embeds (mode, consent text, frame sources)', async () => {
+    const withEmbeds = {
+      ...marvinSite,
+      site: {
+        ...marvinSite.site,
+        embeds: {
+          mode: 'direct',
+          consentText: 'Loads content from {provider}.',
+          frameSources: ['https://www.youtube-nocookie.com', 42, ''],
+        },
+      },
+    } as unknown as MarvinSite;
+    const { marvin } = siteWith(withEmbeds);
+
+    expect((await marvin.getSite()).embeds).toEqual({
+      mode: 'direct',
+      consentText: 'Loads content from {provider}.',
+      frameSources: ['https://www.youtube-nocookie.com'],
+    });
+  });
+
+  it('defaults an unknown embed mode to click_to_load and omits embeds when absent', async () => {
+    const odd = {
+      ...marvinSite,
+      site: { ...marvinSite.site, embeds: { mode: 'sideways' } },
+    } as unknown as MarvinSite;
+
+    expect((await siteWith(odd).marvin.getSite()).embeds?.mode).toBe('click_to_load');
+    expect((await siteWith(marvinSite).marvin.getSite()).embeds).toBeUndefined();
+  });
+
   it('memoizes so brand resolution happens once per process', async () => {
     const { marvin, fake } = siteWith(marvinSite);
 

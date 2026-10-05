@@ -3,6 +3,7 @@ import { createMarvinContent } from '../src/index.js';
 import { createFakeClient, quietLogger } from './support/fakeClient.js';
 import { referenceRead } from './support/fixtures.js';
 import type { MarvinEntry } from '@inneropen/marvin-sdk';
+import { FACADE_HTML, YOUTUBE_URL, youtubeEmbed } from './support/embeds.js';
 
 const CONNECTION = {
   apiUrl: 'http://marvin.test',
@@ -58,6 +59,18 @@ describe('getSectionLanding', () => {
     expect((await marvin.getSectionLanding('bench-notes')).introHtml).toContain(
       'What the workshop is thinking about.'
     );
+  });
+
+  it('renders a bare embedded URL in the intro with the landing entry’s embeds', async () => {
+    const marvin = landingWith({
+      'bench-notes': {
+        ...PAGE_ENTRY,
+        data: { body: `Notes from the bench.\n\n${YOUTUBE_URL}` },
+        embeds: { [YOUTUBE_URL]: youtubeEmbed() },
+      } as unknown as MarvinEntry,
+    });
+
+    expect((await marvin.getSectionLanding('bench-notes')).introHtml).toContain(FACADE_HTML);
   });
 
   it('returns an empty landing when the page entry does not exist', async () => {

@@ -5,6 +5,7 @@
  * second — so a transform reads like a field list instead of a pile of coalescing operators.
  */
 
+import { entryEmbeds, findEmbed, type MarvinEmbed } from './embeds.js';
 import type { MarkdownRenderer } from './markdown.js';
 import { preserveSoftBreaks } from './markdown.js';
 import {
@@ -60,6 +61,11 @@ export type IconFieldOptions = {
 export type MarkdownFieldOptions = {
   /** Keep authored single newlines as hard breaks. Default `false`. */
   softBreaks?: boolean;
+  /**
+   * Render a bare provider URL on its own line as its player, using the entry's `embeds`.
+   * Default `true`; `false` keeps every URL a plain link.
+   */
+  embeds?: boolean;
 };
 
 export type ResourceFieldOptions = {
@@ -88,6 +94,7 @@ export function createFieldAccessor(
   context: FieldAccessorContext
 ) {
   const title = asString((entry as { title?: unknown }).title);
+  const embeds = entryEmbeds(entry);
 
   const accessor = {
     /** The entry itself, for anything the accessor doesn't cover. */
@@ -165,7 +172,18 @@ export function createFieldAccessor(
         (entry as { contentMarkdown?: string | string[] }).contentMarkdown;
       const source = Array.isArray(raw) ? raw.join('\n\n') : asString(raw);
       if (!source) return undefined;
-      return context.renderMarkdown(options.softBreaks ? preserveSoftBreaks(source) : source);
+      return context.renderMarkdown(options.softBreaks ? preserveSoftBreaks(source) : source, {
+        embeds: options.embeds === false ? undefined : embeds,
+      });
+    },
+
+    /**
+     * The resolved embed for an `embed` field (its value is the provider URL), or `undefined`
+     * when the field is empty or the server hasn't resolved it. Render it with `<Embed>` from
+     * `@inneropen/marvin-astro/components`, or output `embed.html`.
+     */
+    embed(key: string): MarvinEmbed | undefined {
+      return findEmbed(embeds, asString(field(entry, key)));
     },
 
     /**

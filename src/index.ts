@@ -133,7 +133,9 @@ export {
   preserveSoftBreaks,
   type MarkdownOptions,
   type MarkdownRenderer,
+  type RenderMarkdownOptions,
 } from './markdown.js';
+export { entryEmbeds, findEmbed, siteEmbeds } from './embeds.js';
 export * from './normalize.js';
 export {
   createRepository,
