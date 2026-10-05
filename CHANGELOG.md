@@ -1,3 +1,10 @@
+## [1.2.2](https://github.com/InnerOpen/marvin-astro/compare/v1.2.1...v1.2.2) (2026-10-05)
+
+
+### Performance Improvements
+
+* request hydrated lists with expand=full ([ae65a90](https://github.com/InnerOpen/marvin-astro/commit/ae65a9015fff3b270f33dea4a1bf23e0d1a91bd8))
+
 ## [1.2.1](https://github.com/InnerOpen/marvin-astro/compare/v1.2.0...v1.2.1) (2026-10-05)
 
 
