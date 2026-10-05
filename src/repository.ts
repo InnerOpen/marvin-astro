@@ -8,7 +8,7 @@
 
 import { errorMessage } from './client.js';
 import { createFieldAccessor, type FieldAccessor } from './fields.js';
-import type { MarvinFetcher } from './fetch.js';
+import { isFullEntry, type MarvinFetcher } from './fetch.js';
 import type { MarkdownRenderer } from './markdown.js';
 import type { MarvinContentEntry } from './types.js';
 
@@ -23,10 +23,11 @@ export type RepositoryOptions<T> = {
   /**
    * Fetch each list item as a full entry before transforming.
    *
-   * The collection endpoint returns `PublishedEntryListItem`, which omits `data_json`; the
-   * single-entry endpoint returns `PublishedEntryRead`, which includes it. So if the transform
-   * reads ANY schema-defined field — anything not title/slug/summary/metadata — this must be
-   * `true` or those fields come back `undefined`. It costs one request per entry.
+   * The collection endpoint returns `PublishedEntryListItem`, which has no `assets[]` or
+   * `resources[]` (only their slugs) and, on older servers, no `data_json`; the single-entry
+   * endpoint returns `PublishedEntryRead`, which has all of it. So if the transform reads asset
+   * roles, resources, or (on an older server) any schema field, this must be `true`. It costs one
+   * request per entry. `bySlug` always works from full entries either way.
    */
   hydrate?: boolean;
   /** Build the resolved item from an entry. May be async (e.g. to render markdown). */
@@ -84,6 +85,9 @@ export function createRepository<T>(
   const slugOf = options.slugOf ?? defaultSlugOf;
   const isFeatured = options.isFeatured ?? defaultIsFeatured;
 
+  /** The loaded list, plus the slugs whose items were built from full entries. */
+  type Loaded = { items: T[]; fromFullEntry: Set<string> };
+  let loadedPromise: Promise<Loaded> | null = null;
   let allPromise: Promise<T[]> | null = null;
   const bySlugCache = new Map<string, Promise<T | undefined>>();
 
@@ -102,11 +106,11 @@ export function createRepository<T>(
     return Promise.resolve(options.transform(entry, fields));
   }
 
-  async function useFallback(): Promise<T[]> {
-    return arrange((await options.fallback?.()) ?? []);
+  async function useFallback(): Promise<Loaded> {
+    return { items: arrange((await options.fallback?.()) ?? []), fromFullEntry: new Set() };
   }
 
-  async function load(): Promise<T[]> {
+  async function load(): Promise<Loaded> {
     if (collections.length > 0 && fetcher.backend.hasBackend()) {
       try {
         const entries = options.hydrate
@@ -115,7 +119,12 @@ export function createRepository<T>(
 
         if (entries.length > 0) {
           const items = await Promise.all(entries.map((entry) => transform(entry)));
-          return arrange(items);
+          const fromFullEntry = new Set<string>();
+          items.forEach((item, index) => {
+            const slug = slugOf(item);
+            if (slug !== undefined && isFullEntry(entries[index])) fromFullEntry.add(slug);
+          });
+          return { items: arrange(items), fromFullEntry };
         }
       } catch (error) {
         fetcher.backend.remember(error);
@@ -133,12 +142,15 @@ export function createRepository<T>(
   }
 
   async function loadBySlug(slug: string): Promise<T | undefined> {
-    // Once the list has loaded, every slug in it is already transformed — a per-entry fetch
-    // would be a second request (and a second hydration) for the same content. On a 280-entry
-    // site that was ~1.4s per detail page.
-    if (allPromise) {
-      const listed = findInList(await allPromise, slug);
-      if (listed) return listed;
+    // Once a hydrated list has loaded, every slug in it is already transformed from a full entry —
+    // a per-entry fetch would be a second request for the same content (~1.4s per detail page on
+    // a 280-entry site). An item built from a bare list item is NOT served: it has no assets[] or
+    // resources[], so a detail page would lose its role-picked images and resource links.
+    let listed: T | undefined;
+    if (loadedPromise) {
+      const loaded = await loadedPromise;
+      listed = findInList(loaded.items, slug);
+      if (listed && loaded.fromFullEntry.has(slug)) return listed;
     }
 
     if (fetcher.backend.hasBackend()) {
@@ -153,11 +165,14 @@ export function createRepository<T>(
 
     // No backend, no such entry, or a transform that blew up: fall back to the resolved list,
     // which is either Marvin's or the static data — the caller doesn't need to care which.
-    return findInList(await all(), slug);
+    return listed ?? findInList(await all(), slug);
   }
 
   function all(): Promise<T[]> {
-    allPromise ??= load();
+    if (!allPromise) {
+      loadedPromise = load();
+      allPromise = loadedPromise.then((loaded) => loaded.items);
+    }
     return allPromise;
   }
 
@@ -184,6 +199,7 @@ export function createRepository<T>(
 
     reset() {
       allPromise = null;
+      loadedPromise = null;
       bySlugCache.clear();
     },
   };

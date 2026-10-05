@@ -31,6 +31,27 @@ export const referenceRead = referenceEntry as unknown as MarvinEntry;
 
 export const marvinSite = sitePayload as unknown as MarvinSite;
 
+/**
+ * A full read reshaped the way the collection endpoint sends the same entry today: `data`
+ * included, but attachments reduced to `assetSlugs` / `resourceSlugs` plus one `featuredAsset`
+ * (the PublishedEntryListItem serialization). No roles, no resources — what a page built from a
+ * list item silently lost.
+ */
+export function listItemOf(full: MarvinEntry): CollectionEntry {
+  const { assets, resources, ...rest } = full as unknown as {
+    assets: { asset?: { slug?: string; publicUrl?: string }; role?: string }[];
+    resources: { resource?: { slug?: string } }[];
+  } & Record<string, unknown>;
+  const hero = assets.find((placement) => placement.role === 'hero') ?? assets[0];
+  return {
+    ...rest,
+    status: 'published',
+    assetSlugs: assets.map((placement) => placement.asset?.slug ?? ''),
+    resourceSlugs: resources.map((link) => link.resource?.slug ?? ''),
+    featuredAsset: hero?.asset ?? null,
+  } as unknown as CollectionEntry;
+}
+
 /** `client.entry()` hands back the SDK's `Entry` wrapper, not the raw payload. */
 export function asEntry(raw: MarvinEntry): Entry {
   return new Entry(raw);

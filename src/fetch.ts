@@ -23,6 +23,22 @@ export type HydratedEntry = MarvinEntry | Entry;
 
 export type MarvinFetcher = ReturnType<typeof createFetcher>;
 
+/**
+ * True for a full entry (`PublishedEntryRead`), false for a list item (`PublishedEntryListItem`).
+ *
+ * `data` doesn't tell them apart: list items carry it too now. What differs is attachments. A full
+ * read has `assets[]` and `resources[]` (placement objects, always present, possibly empty); a list
+ * item has only `assetSlugs` / `resourceSlugs` and a `featuredAsset`. The SDK's `Entry` wrapper
+ * only ever comes from the single-entry read.
+ */
+export function isFullEntry(item: unknown): boolean {
+  if (!item || typeof item !== 'object') return false;
+  if (typeof (item as { field?: unknown }).field === 'function') return true;
+  const raw = item as Record<string, unknown>;
+  if ('assetSlugs' in raw || 'resourceSlugs' in raw) return false;
+  return Array.isArray(raw.assets) || Array.isArray(raw.resources);
+}
+
 /** A failed hydration read is retried this many times in total, backing off from this base. */
 export const HYDRATE_ATTEMPTS = 3;
 export const HYDRATE_BACKOFF_MS = 500;
@@ -102,11 +118,11 @@ export function createFetcher(backend: MarvinBackend) {
   /**
    * Turn list items into full entries.
    *
-   * The collection endpoint returns `PublishedEntryListItem` — core fields plus
-   * `metadata_json`, but NOT `data_json`. `PublishedEntryRead` (the single-entry endpoint)
-   * includes it. So any field defined by the entry type's schema is unreadable from a list
-   * item; it only appears after this hydration pass. Items that already carry data are passed
-   * through untouched.
+   * The collection endpoint returns `PublishedEntryListItem`: core fields, `metadata_json` and
+   * (on current servers) `data`, but only asset/resource *slugs* — no `assets[]` placements (so
+   * no roles: no `hero-grade` image) and no `resources[]`. `PublishedEntryRead` (the single-entry
+   * endpoint) has all of it. Only items that are already full entries ({@link isFullEntry}) are
+   * passed through; everything else is re-read, even when it carries `data`.
    *
    * Reads run at most `config.hydrateConcurrency` at a time. Unbounded, a 280-entry collection
    * fired 280 requests at once, most of which timed out and were dropped — and the first
@@ -117,13 +133,7 @@ export function createFetcher(backend: MarvinBackend) {
       entries,
       backend.config.hydrateConcurrency,
       async (item) => {
-        if (
-          typeof (item as { field?: unknown }).field === 'function' ||
-          'data' in item ||
-          'dataJson' in item
-        ) {
-          return item as HydratedEntry;
-        }
+        if (isFullEntry(item)) return item as HydratedEntry;
         return entryForHydration(item.slug ?? '');
       }
     );

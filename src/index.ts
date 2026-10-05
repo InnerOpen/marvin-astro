@@ -119,7 +119,7 @@ export {
   type MarvinLogger,
   type ResolvedConfig,
 } from './config.js';
-export { createFetcher, type HydratedEntry, type MarvinFetcher } from './fetch.js';
+export { createFetcher, isFullEntry, type HydratedEntry, type MarvinFetcher } from './fetch.js';
 export {
   createFieldAccessor,
   type FieldAccessor,

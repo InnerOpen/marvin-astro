@@ -4,11 +4,14 @@ import { createFakeClient, networkError, quietLogger } from './support/fakeClien
 import {
   asEntry,
   footerNavigationListItems,
+  listItemOf,
   projectRead,
   referenceRead,
   workshopReferenceListItems,
 } from './support/fixtures.js';
 import type { FakeClientSetup } from './support/fakeClient.js';
+import type { FieldAccessor } from '../src/fields.js';
+import type { MarvinContentEntry } from '../src/types.js';
 
 type Reference = {
   slug: string;
@@ -41,6 +44,19 @@ const FULL_READS = {
   [referenceRead.slug]: referenceRead,
   [projectRead.slug]: projectRead,
 };
+
+/** What a project detail page needs from the full entry: a role-picked image and resource links. */
+type Project = { slug: string; title: string; image?: string; materials: number };
+const projectTransform = (entry: MarvinContentEntry, f: FieldAccessor): Project => ({
+  slug: entry.slug ?? '',
+  title: entry.title ?? '',
+  image: f.image({ preferRoles: ['hero-grade'] })?.src,
+  materials: f.resources().length,
+});
+const HERO_GRADE_URL = (
+  projectRead as unknown as { assets: { role: string; asset: { publicUrl: string } }[] }
+).assets.find((placement) => placement.role === 'hero-grade')!.asset.publicUrl;
+const RESOURCE_COUNT = (projectRead as unknown as { resources: unknown[] }).resources.length;
 
 const STATIC_REFERENCES: Reference[] = [
   { slug: 'sizing', title: 'Sizing (static)', order: 1 },
@@ -192,7 +208,28 @@ describe('repository: hydration', () => {
     expect(all.length).toBe(1);
   });
 
-  it('passes entries that already carry data through without a second fetch', async () => {
+  it('hydrates a list item that carries data but no assets[] / resources[]', async () => {
+    // The foundry-jacket regression: list items gained `data`, so hydrate() took them for full
+    // entries and pages lost the hero-grade image and every resource link.
+    const { marvin, fake } = contentWith({
+      collections: { projects: [listItemOf(projectRead)] },
+      entries: FULL_READS,
+    });
+    const projects = marvin.repository<Project>({
+      collection: 'projects',
+      hydrate: true,
+      transform: projectTransform,
+    });
+
+    const [project] = await projects.all();
+
+    expect(fake.countOf(`entry:${projectRead.slug}`)).toBe(1);
+    expect(project.image).toBe(HERO_GRADE_URL);
+    expect(project.materials).toBe(RESOURCE_COUNT);
+    expect(RESOURCE_COUNT).toBeGreaterThan(0);
+  });
+
+  it('passes full entries through without a second fetch', async () => {
     const { marvin, fake } = contentWith({
       collections: { projects: [projectRead] },
       entries: FULL_READS,
@@ -261,21 +298,59 @@ describe('repository: bySlug', () => {
     expect(fake.countOf('entry:')).toBe(1);
   });
 
-  it('serves from the loaded list without an entry fetch once all() has resolved', async () => {
+  it('serves from a hydrated list without another entry fetch once all() has resolved', async () => {
     const { marvin, fake } = contentWith({
       collections: { 'workshop-reference': workshopReferenceListItems },
       entries: FULL_READS,
     });
     const references = marvin.repository<Reference>({
       collection: 'workshop-reference',
+      hydrate: true,
       transform: (entry) => ({ slug: entry.slug ?? '', title: entry.title ?? '', order: 0 }),
     });
 
     const all = await references.all();
+    const readsForList = fake.countOf('entry:');
     const faq = await references.bySlug('faq');
 
     expect(faq).toBe(all.find((item) => item.slug === 'faq'));
-    expect(fake.countOf('entry:')).toBe(0);
+    expect(fake.countOf('entry:')).toBe(readsForList);
+  });
+
+  it('returns the full entry, not the list item, when the list was not hydrated', async () => {
+    const { marvin, fake } = contentWith({
+      collections: { projects: [listItemOf(projectRead)] },
+      entries: FULL_READS,
+    });
+    const projects = marvin.repository<Project>({
+      collection: 'projects',
+      transform: projectTransform,
+    });
+
+    const [listed] = await projects.all();
+    const project = await projects.bySlug(projectRead.slug);
+
+    // The list item only knows its featuredAsset (the plain hero) and no resources.
+    expect(listed.image).not.toBe(HERO_GRADE_URL);
+    expect(listed.materials).toBe(0);
+    expect(fake.countOf(`entry:${projectRead.slug}`)).toBe(1);
+    expect(project?.image).toBe(HERO_GRADE_URL);
+    expect(project?.materials).toBe(RESOURCE_COUNT);
+  });
+
+  it('falls back to the list item when the full read is unavailable', async () => {
+    const { marvin } = contentWith({
+      collections: { projects: [listItemOf(projectRead)] },
+      entries: {},
+    });
+    const projects = marvin.repository<Project>({
+      collection: 'projects',
+      transform: projectTransform,
+    });
+
+    const [listed] = await projects.all();
+
+    expect(await projects.bySlug(projectRead.slug)).toBe(listed);
   });
 
   it('falls back to an entry fetch, then the list, for a slug all() does not contain', async () => {

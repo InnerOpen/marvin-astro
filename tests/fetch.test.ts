@@ -1,7 +1,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { MarvinBackend } from '../src/client.js';
-import { createFetcher } from '../src/fetch.js';
+import { createFetcher, isFullEntry } from '../src/fetch.js';
 import type { MarvinContentEntry } from '../src/types.js';
+import { asEntry, listItemOf, projectRead } from './support/fixtures.js';
 
 function makeBackend(opts: { hasBackend?: boolean; client?: unknown; latched?: boolean } = {}) {
   const remembered: unknown[] = [];
@@ -85,16 +86,46 @@ describe('createFetcher — collectionEntriesFallback', () => {
   });
 });
 
+describe('isFullEntry', () => {
+  it('is true for a full read: assets[] / resources[] placements, or the SDK Entry wrapper', () => {
+    expect(isFullEntry(projectRead)).toBe(true);
+    expect(isFullEntry({ slug: 'a', data: {}, assets: [], resources: [] })).toBe(true);
+    expect(isFullEntry(asEntry(projectRead))).toBe(true);
+  });
+
+  it('is false for a list item, even one that carries data', () => {
+    expect(isFullEntry(listItemOf(projectRead))).toBe(false);
+    expect(isFullEntry({ slug: 'a', data: { x: 1 } })).toBe(false);
+    expect(isFullEntry({ slug: 'a', data: {}, assets: [], assetSlugs: [] })).toBe(false);
+    expect(isFullEntry({ slug: 'a' })).toBe(false);
+    expect(isFullEntry(null)).toBe(false);
+  });
+});
+
 describe('createFetcher — hydrate', () => {
-  it('passes through items with data and fetches full entries for bare list items', async () => {
-    const full = { slug: 'full', data: { x: 1 } } as unknown as MarvinContentEntry;
-    const bare = { slug: 'bare' } as unknown as MarvinContentEntry;
-    const client = { entry: async (slug: string) => ({ slug, fetched: true }) };
+  it('re-reads list items — with or without data — and passes full entries through', async () => {
+    const full = { slug: 'full', data: { x: 1 }, assets: [], resources: [] };
+    const listItemWithData = { slug: 'listed', data: { x: 1 }, assetSlugs: ['a'], resourceSlugs: [] };
+    const bare = { slug: 'bare' };
+    const reads: string[] = [];
+    const client = {
+      entry: async (slug: string) => {
+        reads.push(slug);
+        return { slug, fetched: true };
+      },
+    };
     const { backend } = makeBackend({ client });
 
-    const out = await createFetcher(backend).hydrate([full, bare]);
-    expect(out).toContainEqual({ slug: 'full', data: { x: 1 } });
+    const out = await createFetcher(backend).hydrate([
+      full,
+      listItemWithData,
+      bare,
+    ] as unknown as MarvinContentEntry[]);
+
+    expect(out).toContainEqual(full);
+    expect(out).toContainEqual({ slug: 'listed', fetched: true });
     expect(out).toContainEqual({ slug: 'bare', fetched: true });
+    expect(reads.sort()).toEqual(['bare', 'listed']);
   });
 });
 

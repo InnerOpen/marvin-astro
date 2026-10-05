@@ -80,12 +80,16 @@ page — and only fetches the entry directly when nothing is loaded yet or the s
 
 ## Why `hydrate`
 
-The collection endpoint returns `PublishedEntryListItem`, which carries core fields and
-`metadata_json` but **not** `data_json`. The single-entry endpoint returns `PublishedEntryRead`,
-which includes it.
+The collection endpoint returns `PublishedEntryListItem`: core fields, `metadata_json` and (on
+current servers) `data`, but only the *slugs* of its assets and resources — no `assets[]`
+placements (so no roles, no `hero-grade` image) and no `resources[]`. The single-entry endpoint
+returns `PublishedEntryRead`, which has all of it.
 
-So if a transform reads any schema-defined field — anything beyond title/slug/summary/metadata —
-`hydrate: true` is required or those fields come back `undefined`. It costs one request per entry.
+So if a transform reads asset roles, resources, or (on an older server, whose list items lack
+`data`) any schema field, `hydrate: true` is required. It costs one request per entry. Items are
+re-read unless they're already full entries (`isFullEntry`: `assets[]`/`resources[]` present, no
+`assetSlugs`) — carrying `data` isn't enough. `bySlug()` serves a detail page from the loaded list
+only when that item came from a full entry; otherwise it fetches the entry.
 
 Those requests run at most `hydrateConcurrency` at a time (default 6) rather than all at once, and
 a read that fails is retried with backoff (3 attempts) before the entry is dropped, so a single
