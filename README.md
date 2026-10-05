@@ -3,13 +3,15 @@
 Site integration for [Marvin CMS](https://github.com/inneropen) on Astro: content repositories
 with static fallbacks, site chrome from collections, and payload normalization.
 
-Three packages, three concerns:
+Two packages, two concerns:
 
 | Package | Concern |
 |---|---|
 | `@inneropen/marvin-sdk` | transport — HTTP client, entries, collections, assets |
-| `@inneropen/marvin-renderers-core` | entry-type → Astro renderer component mapping |
-| **`@inneropen/marvin-astro`** | **site integration — repositories, chrome, normalization** |
+| **`@inneropen/marvin-astro`** | **site integration — repositories, chrome, normalization, and the Astro components (forms, media embeds, entry-type renderers)** |
+
+`@inneropen/marvin-renderers-core` has been folded in here — see
+[Migrating from @inneropen/marvin-renderers-core](#migrating-from-inneropenmarvin-renderers-core).
 
 A new site wires up to a Marvin workspace by installing one package, setting three env vars, and
 writing only its own transform functions.
@@ -104,7 +106,8 @@ fall-through a legacy value that *is* set would never surface.
 | `f.string(key)` `f.number(key)` `f.bool(key)` `f.list(key)` | scalars; `bool` reads `"true"`/`"1"`/`"yes"` |
 | `f.oneOf(key, allowed, fallback)` | enum guard — replaces per-field `normalizeStatus`-style helpers |
 | `f.raw(key)` `f.data()` `f.metadata()` | untyped escape hatches |
-| `f.markdown(key?, { softBreaks })` | renders to HTML; `undefined` when there is nothing to render |
+| `f.markdown(key?, { softBreaks, embeds })` | renders to HTML, with [media embeds](#media-embeds); `undefined` when there is nothing to render |
+| `f.embed(key)` | the resolved embed for an `embed` field — render with `<Embed>` |
 | `f.date(key)` `f.publishedAt()` | display date ("Mon DD, YYYY") / raw ISO stamp |
 | `f.image(options)` `f.images(options)` `f.icon(options)` | resolved `{src, alt, focalPoint}` |
 | `f.asset(options)` `f.assetByRole(...roles)` `f.assets()` | raw asset placements |
@@ -143,6 +146,153 @@ The default prefixes the entry's own non-navigation collection: an entry in `wor
 becomes `/workshop-reference/<slug>`, an entry in no other collection becomes `/<slug>`. Override
 when routes don't mirror collections.
 
+## Media embeds
+
+Paste a YouTube, Vimeo, Spotify, SoundCloud, Apple Music/Podcasts, Tidal or podcast link on its
+own line in a markdown field and Marvin resolves it on the server. The published entry then
+carries `embeds`, keyed by the URL exactly as written, each with Marvin-built `html` for the
+site's embed mode and the structured fields behind it. The stored markdown never changes, so a
+site that doesn't render embeds just shows the link.
+
+**Markdown.** `f.markdown()` passes the entry's embeds automatically. A paragraph that is exactly
+a URL with an `embeds` entry renders as that embed's `html`; `<url>`, `[text](url)`, a URL inside
+a sentence and anything in code stay as they are. Opt a field out with `f.markdown('body',
+{ embeds: false })`. Where you call the renderer yourself, pass the embeds:
+
+```ts
+import { entryEmbeds } from '@inneropen/marvin-astro';
+
+const bodyHtml = await marvin.renderMarkdown(body, { embeds: entryEmbeds(entry) });
+```
+
+**`embed` fields.** An `embed` field's value is the provider URL; `f.embed(key)` returns its
+resolved embed. Render it with `<Embed>`, which builds the player, facade or link card from the
+structured fields:
+
+```astro
+---
+import { Embed } from '@inneropen/marvin-astro/components';
+const site = await marvin.getSite();
+---
+<Embed
+  embed={post.video}
+  mode={site.embeds?.mode}
+  consentText={site.embeds?.consentText}
+  frameSources={site.embeds?.frameSources}
+/>
+```
+
+**The loader and CSS.** In `click_to_load` mode (Marvin's default) an embed is a facade — a
+button and a plain link — and nothing loads from the provider until the visitor clicks. Put
+`<EmbedLoader />` once in your layout:
+
+```astro
+---
+import { EmbedLoader } from '@inneropen/marvin-astro/components';
+---
+<body>
+  <slot />
+  <EmbedLoader />
+</body>
+```
+
+On click (or Enter/Space) it swaps the button for the iframe. It builds the iframe only from the
+facade's `data-marvin-embed-attrs`, keeps only `src`, `title`, `allow`, `sandbox`,
+`referrerpolicy`, `loading` and `style`, refuses any `src` that isn't https on a host in
+`data-marvin-embed-hosts`, and never parses HTML. It also brings the base `.marvin-embed` CSS:
+responsive aspect ratio for video, fixed height for audio, facade and link-card styles. The
+rules have zero specificity, so any site rule wins; theme through custom properties:
+
+```css
+.marvin-embed, .marvin-embed-link {
+  --marvin-embed-radius: 0;
+  --marvin-embed-bg: var(--ink);
+  --marvin-embed-fg: var(--paper);
+  --marvin-embed-max-width: 48rem;
+}
+```
+
+The full list (`--marvin-embed-aspect`, `-height`, `-margin`, `-muted`, `-border`, `-focus`, …)
+is at the top of `src/components/embeds.css`. For CSS without the loader (a `direct`-mode site),
+`import '@inneropen/marvin-astro/components/embeds.css'`.
+
+**CSP.** `site.embeds.frameSources` lists every origin the site's embeds may frame. Use it for a
+`frame-src` directive:
+
+```astro
+---
+const site = await marvin.getSite();
+const frameSrc = ["'self'", ...(site.embeds?.frameSources ?? [])].join(' ');
+---
+<meta http-equiv="Content-Security-Policy" content={`frame-src ${frameSrc}`} />
+```
+
+The loader script is small enough that Astro inlines it; if your CSP forbids inline scripts, hash
+it or set `vite.build.assetsInlineLimit: 0` so Astro emits it as a file.
+
+The embed types (`MarvinEmbed`, `MarvinSiteEmbeds`, …) are declared in this package, so none of
+this needs a newer SDK.
+
+## Components
+
+`@inneropen/marvin-astro/components` ships Astro source, compiled by your site's build.
+
+| Component | Use |
+|---|---|
+| `FormRenderer` | a public form from a submittable entry type's `formSchema`; unstyled, progressive-enhancement submit |
+| `Embed`, `LinkCard`, `EmbedLoader` | media embeds (above) |
+| `EntryRenderer` | picks the renderer for an entry from its entry type's `rendering` |
+| `PageRenderer`, `ArticleRenderer`, `FaqRenderer`, `NavigationRenderer` | unstyled, semantic core renderers with `data-renderer`/`data-role` hooks |
+
+Page and Article render the markdown body (with embeds); pass `renderMarkdown={marvin.renderMarkdown}`
+to use your site's markdown options.
+
+The registry and logic: `getRenderer`, `astroRegistry`, `coreRendererPackage` from
+`@inneropen/marvin-astro/components` (or `/components/registry`), and the framework-agnostic
+helpers — `resolveRendererName`, `resolveRendererConfig`, `extractBody`, `extractField`,
+`getFeaturedAsset`, `createRegistry`, `createPackageRegistry`, `createRendererPackage`,
+`validateRenderers`, … — from `@inneropen/marvin-astro/renderers`.
+
+Build-time check that every rendered entry type has a renderer:
+
+```js
+// astro.config.mjs
+import { marvinIntegration } from '@inneropen/marvin-astro/components/integration';
+import { astroRegistry } from '@inneropen/marvin-astro/components/registry';
+
+export default defineConfig({
+  integrations: [marvinIntegration({ registry: astroRegistry })],
+});
+```
+
+Options: `registry` (required), `apiUrl`, `siteToken` (default to the `MARVIN_*` env vars),
+`strict` (throw instead of warn), `ignore` (entry-type slugs to skip).
+
+Marvin's system entry types name their renderer package `@inneropen/marvin-renderers-core`; the
+core renderers still answer to that name (and to `@inneropen/marvin-astro`).
+
+## Migrating from @inneropen/marvin-renderers-core
+
+The components and logic moved here with their names unchanged. Swap the import paths, then
+remove `@inneropen/marvin-renderers-core` from `package.json`:
+
+| Before (`@inneropen/marvin-renderers-core…`) | After (`@inneropen/marvin-astro…`) |
+|---|---|
+| `/astro` | `/components` |
+| `/astro/registry` | `/components/registry` |
+| `/astro/integration` | `/components/integration` |
+| `/astro/renderers/PageRenderer.astro` (etc.) | `/components/renderers/PageRenderer.astro` |
+| `/logic` | `/renderers` |
+
+```diff
+-import { FormRenderer } from '@inneropen/marvin-renderers-core/astro';
++import { FormRenderer } from '@inneropen/marvin-astro/components';
+```
+
+Behaviour changes: Page/Article now render the body as markdown instead of injecting it raw, and
+`EntryRenderer` renders core entry types without a custom registry (it silently rendered only
+its slot before).
+
 ## The failure latch
 
 A static build asks for content once per path. When the backend is down that means N failed
@@ -162,8 +312,8 @@ marvin.backend.clearLatch();
 
 ## SEO head (optional)
 
-One component ships, behind its own export path, so the core package stays pure TypeScript and
-Astro stays an optional peer dependency.
+`SeoHead` ships behind its own export path (as do the [components](#components)), so the core
+package stays pure TypeScript and Astro stays an optional peer dependency.
 
 ```astro
 ---
@@ -187,18 +337,23 @@ verification tags. No styling, no site coupling.
 | `@inneropen/marvin-astro` | `createMarvinContent` and every helper below it |
 | `@inneropen/marvin-astro/types` | resolved types only (`ApiSite`, `ApiSeo`, `ApiSiteChrome`, …) |
 | `@inneropen/marvin-astro/astro` | `SeoHead` |
+| `@inneropen/marvin-astro/components` | `FormRenderer`, `Embed`, `LinkCard`, `EmbedLoader`, `EntryRenderer`, the core renderers, registry, `marvinIntegration` |
+| `@inneropen/marvin-astro/components/registry` | `getRenderer`, `astroRegistry`, `coreRendererPackage` |
+| `@inneropen/marvin-astro/components/integration` | `marvinIntegration` (for `astro.config.mjs`) |
+| `@inneropen/marvin-astro/components/*` | individual components, `renderers/*.astro`, `embeds.css` |
+| `@inneropen/marvin-astro/renderers` | renderer logic (compiled): resolve, registry, validation |
 
 Beyond `createMarvinContent`, the pieces are usable on their own: `createBackend`,
 `createFetcher`, `createRepository`, `createSiteLoader`, `createChromeLoader`,
-`createFieldAccessor`, `createMarkdownRenderer`, `formatDisplayDate`, `selectValuesForPage`, and
-the whole `normalize` surface.
+`createFieldAccessor`, `createMarkdownRenderer`, `entryEmbeds`, `findEmbed`, `siteEmbeds`,
+`formatDisplayDate`, `selectValuesForPage`, and the whole `normalize` surface.
 
 ## Development
 
 ```bash
 npm install
 npm run typecheck
-npm test          # vitest, fixture-driven, no network
+npm test          # vitest, fixture-driven, no network; .astro components via Astro's Container API
 npm run build     # tsup → dist/ with .d.ts
 ```
 
