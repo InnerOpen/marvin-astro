@@ -1,3 +1,16 @@
+# [1.2.0](https://github.com/InnerOpen/marvin-astro/compare/v1.1.1...v1.2.0) (2026-10-05)
+
+
+### Bug Fixes
+
+* **embeds:** match the markup and null fields Marvin actually publishes ([8b9ca0c](https://github.com/InnerOpen/marvin-astro/commit/8b9ca0c895ada3192dde47b9c57c68696cab00b6))
+
+
+### Features
+
+* **components:** fold in the renderers-core components; add Embed, LinkCard, EmbedLoader ([9e2b8de](https://github.com/InnerOpen/marvin-astro/commit/9e2b8de88a4697c7ca935b3c07b3628cba9d6285))
+* render media embeds from markdown and embed fields ([94e5e91](https://github.com/InnerOpen/marvin-astro/commit/94e5e91c19024b473c8d59cb20a1533767110bd3))
+
 ## [1.1.1](https://github.com/inneropen/marvin-astro/compare/v1.1.0...v1.1.1) (2026-09-12)
 
 
