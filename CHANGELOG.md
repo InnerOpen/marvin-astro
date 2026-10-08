@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/InnerOpen/marvin-astro/compare/v1.2.2...v1.3.0) (2026-10-08)
+
+
+### Features
+
+* **chrome:** emptied collections render nothing; social links from a collection ([321f3ef](https://github.com/InnerOpen/marvin-astro/commit/321f3ef0ccc599f1524f053275737632f059e4d7))
+
 ## [1.2.2](https://github.com/InnerOpen/marvin-astro/compare/v1.2.1...v1.2.2) (2026-10-05)
 
 
