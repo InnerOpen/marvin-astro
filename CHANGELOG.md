@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/InnerOpen/marvin-astro/compare/v1.3.0...v1.4.0) (2026-10-08)
+
+
+### Features
+
+* one build-time "is Marvin up?" check decides every fallback ([0e16ff5](https://github.com/InnerOpen/marvin-astro/commit/0e16ff5ccea95929bc9c5e5192b1a3b450db2366))
+
 # [1.3.0](https://github.com/InnerOpen/marvin-astro/compare/v1.2.2...v1.3.0) (2026-10-08)
 
 

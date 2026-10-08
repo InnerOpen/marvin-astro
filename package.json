@@ -1,6 +1,6 @@
 {
   "name": "@inneropen/marvin-astro",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Site integration for Marvin CMS on Astro — repositories, site chrome, and payload normalization",
   "type": "module",
   "exports": {
