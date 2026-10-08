@@ -118,10 +118,10 @@ describe('legal split', () => {
     expect(chrome.footerNavigation.flat().map((link) => link.label)).toContain('Terms');
   });
 
-  it('uses the static legal links when Marvin has no footer collection', async () => {
+  it('uses the static legal links when Marvin is down', async () => {
     const { marvin } = chromeWith(
       { fallback: { legalLinks: [{ label: 'Terms', href: '/terms', role: 'legal' }] } },
-      { collections: { 'main-navigation': [] } }
+      { throws: networkError() }
     );
     const chrome = await marvin.getSiteChrome();
 
@@ -131,7 +131,7 @@ describe('legal split', () => {
   });
 });
 
-describe('an emptied collection', () => {
+describe('Marvin up: its answer is final', () => {
   const STATIC = {
     fallback: {
       mainNavigation: [{ label: 'Home', href: '/' }],
@@ -140,7 +140,7 @@ describe('an emptied collection', () => {
     },
   };
 
-  it('shows nothing rather than the static links', async () => {
+  it('an emptied collection shows nothing rather than the static links', async () => {
     const { marvin } = chromeWith(STATIC, {
       collections: { 'main-navigation': [], 'footer-navigation': [] },
     });
@@ -151,12 +151,25 @@ describe('an emptied collection', () => {
     expect(chrome.legalLinks).toEqual([]);
   });
 
-  it('still falls back when the collection does not exist', async () => {
-    const { marvin } = chromeWith(STATIC, { collections: {} });
+  it('a missing or hidden collection shows nothing too', async () => {
+    const { marvin } = chromeWith(
+      { fallback: { ...STATIC.fallback, inquiry: { label: 'Get in touch', href: '/contact' } } },
+      { collections: {}, site: { ...marvinSite, site: { ...marvinSite.site, metadataJson: {} } } }
+    );
+    const chrome = await marvin.getSiteChrome();
+
+    expect(chrome.mainNavigation).toEqual([]);
+    expect(chrome.footerNavigation.flat()).toEqual([]);
+    expect(chrome.inquiry).toBeUndefined();
+  });
+
+  it('Marvin down: every part is the static fallback', async () => {
+    const { marvin } = chromeWith(STATIC, { throws: networkError() });
     const chrome = await marvin.getSiteChrome();
 
     expect(chrome.mainNavigation.map((link) => link.label)).toEqual(['Home']);
     expect(chrome.footerNavigation.flat().map((link) => link.label)).toEqual(['About']);
+    expect(chrome.legalLinks.map((link) => link.label)).toEqual(['Terms']);
   });
 });
 
@@ -224,14 +237,18 @@ describe('social links', () => {
     ]);
   });
 
-  it('is empty when the social-links collection is emptied', async () => {
+  it('never uses the static links while Marvin is up, even with nothing to show', async () => {
+    const bare = {
+      ...marvinSite,
+      site: { ...marvinSite.site, social: null, contactEmail: null },
+    } as unknown as typeof marvinSite;
     const { marvin } = chromeWith(
       {
         fallback: {
           socialLinks: [{ label: 'Instagram', href: 'https://instagram.com/x', icon: 'instagram' }],
         },
       },
-      { collections: { ...NAV_COLLECTIONS, 'social-links': [] } }
+      { collections: { ...NAV_COLLECTIONS, 'social-links': [] }, site: bare }
     );
     const chrome = await marvin.getSiteChrome();
 

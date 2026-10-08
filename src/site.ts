@@ -116,7 +116,8 @@ function transformMarvinSite(marvinSite: MarvinSite, fallback: ApiSite): ApiSite
     timezone: asString(config.timezone) ?? fallback.timezone,
     email: asString(config.contactEmail) ?? fallback.email,
     imprint: asString(metadata.imprint) ?? fallback.imprint,
-    social: { ...fallback.social, ...normalizeSocial(config.social) },
+    // Marvin's social map only: once Marvin answers, the static one must not leak back in.
+    social: normalizeSocial(config.social),
     // Typed `config.seo` when the SDK declares it, else the raw `metadata.seo` blob — older
     // SDKs drop the typed field but pass the blob through untouched, and workspaces configured
     // before the typed field existed still only have the blob.
@@ -140,12 +141,19 @@ function looksLikeAssetSlug(value: string): boolean {
 
 export type SiteLoader = {
   get(): Promise<ApiSite>;
+  /**
+   * The build's one "is Marvin up?" answer: true when the site configuration came from Marvin.
+   * When it did, Marvin's content is final (an empty or hidden collection shows nothing); the
+   * static fallbacks stand in only when it didn't.
+   */
+  online(): Promise<boolean>;
   reset(): void;
 };
 
 export function createSiteLoader(fetcher: MarvinFetcher, options: SiteOptions = {}): SiteLoader {
   const fallback = buildFallbackSite(options);
   let promise: Promise<ApiSite> | null = null;
+  let fromMarvin = false;
 
   async function resolveAssetSlug(slug: string | undefined): Promise<string | undefined> {
     if (!slug) return undefined;
@@ -161,6 +169,7 @@ export function createSiteLoader(fetcher: MarvinFetcher, options: SiteOptions = 
 
   async function load(): Promise<ApiSite> {
     const marvinSite = await fetcher.site();
+    fromMarvin = marvinSite !== null;
     if (!marvinSite) return fallback;
 
     const site = transformMarvinSite(marvinSite, fallback);
@@ -215,8 +224,13 @@ export function createSiteLoader(fetcher: MarvinFetcher, options: SiteOptions = 
       promise ??= load();
       return promise;
     },
+    async online() {
+      await this.get();
+      return fromMarvin;
+    },
     reset() {
       promise = null;
+      fromMarvin = false;
     },
   };
 }

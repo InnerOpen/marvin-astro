@@ -55,9 +55,9 @@ export type ChromeOptions = {
   /** Collection holding the footer nav. Default `'footer-navigation'`. */
   footerCollection?: string;
   /**
-   * Collection holding the social links. Default `'social-links'`. When it exists, its entries
-   * (label, href, optional `icon` field) are exactly the social links, in order, and the site
-   * `social` map is left out; when it doesn't, the social map is used.
+   * Collection holding the social links. Default `'social-links'`. When it has entries, they
+   * (label, href, optional `icon` field) are exactly the social links, in order; otherwise the
+   * site `social` map is used.
    */
   socialCollection?: string;
   /**
@@ -197,21 +197,14 @@ export function createChromeLoader(
   async function navigationCollection(
     slug: string,
     context: NavigationContext,
-    staticLinks: ApiNavigationLink[]
-  ): Promise<{ links: ApiNavigationLink[]; entries: HydratedEntry[]; fromBackend: boolean }> {
-    if (!fetcher.backend.hasBackend()) return { links: staticLinks, entries: [], fromBackend: false };
+    online: boolean
+  ): Promise<{ links: ApiNavigationLink[]; entries: HydratedEntry[] }> {
+    if (!online) return { links: [], entries: [] };
 
     // Hydrated: a nav entry's `href`/`label` overrides are schema fields, absent from list items.
+    // Empty, hidden or missing all read as empty: Marvin is up, so its answer is final.
     const entries = await fetcher.hydratedCollectionEntries(slug);
-    // An existing collection that is empty means "show nothing"; the static links stand in only
-    // when Marvin has no such collection or can't be reached.
-    if (entries.length === 0) {
-      const exists = (await fetcher.collection(slug)) !== null;
-      return { links: exists ? [] : staticLinks, entries, fromBackend: exists };
-    }
-
-    const links = entries.map((entry) => entryToLink(entry, slug, context));
-    return { links, entries, fromBackend: true };
+    return { links: entries.map((entry) => entryToLink(entry, slug, context)), entries };
   }
 
   function groupFooterLinks(links: ApiNavigationLink[]): ApiNavigationLink[][] {
@@ -221,10 +214,10 @@ export function createChromeLoader(
     return [links.slice(0, midpoint), links.slice(midpoint)];
   }
 
-  /** The social-links collection as links, or null when Marvin has no such collection. */
-  async function socialEntries(): Promise<ApiSocialLink[] | null> {
-    const social = await navigationCollection(socialCollection, 'footer', []);
-    if (!social.fromBackend) return null;
+  /** The social-links collection as links, or null when it has no entries. */
+  async function socialEntries(online: boolean): Promise<ApiSocialLink[] | null> {
+    const social = await navigationCollection(socialCollection, 'footer', online);
+    if (social.links.length === 0) return null;
 
     return social.links.map((link, index) => ({
       ...link,
@@ -233,13 +226,13 @@ export function createChromeLoader(
     }));
   }
 
-  /** The site `social` map plus the contact email; the static social links when both are empty. */
-  function siteSocialLinks(site: ApiSite): ApiSocialLink[] {
+  /** The site `social` map plus the contact email; offline, the static social links if both are empty. */
+  function siteSocialLinks(site: ApiSite, online: boolean): ApiSocialLink[] {
     const links = Object.entries(site.social).map(([key, href]) => socialLinkFromKey(key, href));
     if (site.email && !links.some((link) => link.icon === 'email')) {
       links.push(socialLinkFromKey('email', `mailto:${site.email}`));
     }
-    if (links.length > 0) return links;
+    if (links.length > 0 || online) return links;
 
     return (fallback.socialLinks ?? []).map((link) => ({
       ...toNavigationLink(link),
@@ -254,10 +247,13 @@ export function createChromeLoader(
       group.map(toNavigationLink)
     );
 
-    const main = await navigationCollection(mainCollection, 'main', staticMain);
-    const footer = await navigationCollection(footerCollection, 'footer', staticFooter.flat());
+    // The build's one "is Marvin up?" check: online, Marvin's content is final everywhere below;
+    // offline, every part of the chrome is the static fallback.
+    const online = await siteLoader.online();
+    const main = await navigationCollection(mainCollection, 'main', online);
+    const footer = await navigationCollection(footerCollection, 'footer', online);
 
-    const social = await socialEntries();
+    const social = await socialEntries(online);
 
     // Split footer links by membership role: legal → the legal strip; everything else → columns.
     const columnLinks = footer.links.filter((link) => link.role !== legalRole);
@@ -265,15 +261,13 @@ export function createChromeLoader(
 
     return {
       site,
-      mainNavigation: main.links,
-      footerNavigation: footer.fromBackend ? groupFooterLinks(columnLinks) : staticFooter,
-      legalLinks: footer.fromBackend
-        ? footer.links.filter((link) => link.role === legalRole)
-        : staticLegal,
-      socialLinks: social ?? siteSocialLinks(site),
-      inquiry:
-        metadataLink(site.metadata.inquiry) ??
-        (fallback.inquiry ? toNavigationLink(fallback.inquiry) : undefined),
+      mainNavigation: online ? main.links : staticMain,
+      footerNavigation: online ? groupFooterLinks(columnLinks) : staticFooter,
+      legalLinks: online ? footer.links.filter((link) => link.role === legalRole) : staticLegal,
+      socialLinks: social ?? siteSocialLinks(site, online),
+      inquiry: online
+        ? metadataLink(site.metadata.inquiry)
+        : fallback.inquiry && toNavigationLink(fallback.inquiry),
     };
   }
 

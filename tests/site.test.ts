@@ -229,8 +229,8 @@ describe('getSite', () => {
     expect(site.description).toBe('A static description');
     expect(site.tagline).toBe('Static tagline');
     expect(site.email).toBe('static@example.com');
-    // Static social survives alongside anything the backend adds.
-    expect(site.social.instagram).toBe('https://instagram.com/static');
+    // Social is a set, not a field: Marvin's (here: none) replaces the static map outright.
+    expect(site.social).toEqual({});
   });
 
   it('resolves site.embeds (mode, consent text, frame sources)', async () => {

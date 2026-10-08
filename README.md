@@ -143,9 +143,13 @@ change per asset. `logo`, `favicon` and `seal` are aliased onto the top level.
 `getSiteChrome()` reads `main-navigation` and `footer-navigation` collections, splits
 `role: 'legal'` entries into `legalLinks`, and groups the rest into footer columns. Social links
 come from a `social-links` collection when the workspace has one (each entry's label, href and
-optional `icon` field, in order), otherwise from the site's `social` map. A collection that exists
-but is empty renders nothing: the static `chrome.fallback` links stand in only when Marvin has no
-such collection or can't be reached. A nav entry's
+optional `icon` field, in order), otherwise from the site's `social` map.
+
+Fallbacks follow one build-time check: did the site configuration come from Marvin
+(`siteLoader.online()`)? If it did, Marvin's content is final — an empty, hidden or missing
+collection renders nothing, and the static `site.fallback.social` / `chrome.fallback` links are
+never mixed in. Only when Marvin is down or unconfigured does the whole chrome come from the static
+fallbacks. A nav entry's
 route comes from an explicit `href`/`url`/`path` field if it has one, otherwise from
 `resolveHref`:
 
