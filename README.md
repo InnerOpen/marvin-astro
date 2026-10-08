@@ -141,7 +141,11 @@ a site adds a shared brand asset with one config line and reads `site.brand.<nam
 change per asset. `logo`, `favicon` and `seal` are aliased onto the top level.
 
 `getSiteChrome()` reads `main-navigation` and `footer-navigation` collections, splits
-`role: 'legal'` entries into `legalLinks`, and groups the rest into footer columns. A nav entry's
+`role: 'legal'` entries into `legalLinks`, and groups the rest into footer columns. Social links
+come from a `social-links` collection when the workspace has one (each entry's label, href and
+optional `icon` field, in order), otherwise from the site's `social` map. A collection that exists
+but is empty renders nothing: the static `chrome.fallback` links stand in only when Marvin has no
+such collection or can't be reached. A nav entry's
 route comes from an explicit `href`/`url`/`path` field if it has one, otherwise from
 `resolveHref`:
 

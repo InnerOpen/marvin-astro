@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { createMarvinContent } from '../src/index.js';
-import { defaultResolveHref, metadataLink, socialLinkFromKey } from '../src/chrome.js';
+import {
+  defaultResolveHref,
+  metadataLink,
+  socialIconFor,
+  socialLinkFromKey,
+} from '../src/chrome.js';
 import { createFakeClient, networkError, quietLogger } from './support/fakeClient.js';
 import { footerNavigationListItems, mainNavigationListItems, marvinSite } from './support/fixtures.js';
 import type { MarvinEntry } from '@inneropen/marvin-sdk';
@@ -113,16 +118,45 @@ describe('legal split', () => {
     expect(chrome.footerNavigation.flat().map((link) => link.label)).toContain('Terms');
   });
 
-  it('uses the static legal links when the backend supplies none', async () => {
+  it('uses the static legal links when Marvin has no footer collection', async () => {
     const { marvin } = chromeWith(
       { fallback: { legalLinks: [{ label: 'Terms', href: '/terms', role: 'legal' }] } },
-      { collections: { 'main-navigation': [], 'footer-navigation': [] } }
+      { collections: { 'main-navigation': [] } }
     );
     const chrome = await marvin.getSiteChrome();
 
     expect(chrome.legalLinks).toEqual([
       { label: 'Terms', href: '/terms', description: undefined, external: false, role: 'legal' },
     ]);
+  });
+});
+
+describe('an emptied collection', () => {
+  const STATIC = {
+    fallback: {
+      mainNavigation: [{ label: 'Home', href: '/' }],
+      footerNavigation: [[{ label: 'About', href: '/about' }]],
+      legalLinks: [{ label: 'Terms', href: '/terms', role: 'legal' }],
+    },
+  };
+
+  it('shows nothing rather than the static links', async () => {
+    const { marvin } = chromeWith(STATIC, {
+      collections: { 'main-navigation': [], 'footer-navigation': [] },
+    });
+    const chrome = await marvin.getSiteChrome();
+
+    expect(chrome.mainNavigation).toEqual([]);
+    expect(chrome.footerNavigation).toEqual([[]]);
+    expect(chrome.legalLinks).toEqual([]);
+  });
+
+  it('still falls back when the collection does not exist', async () => {
+    const { marvin } = chromeWith(STATIC, { collections: {} });
+    const chrome = await marvin.getSiteChrome();
+
+    expect(chrome.mainNavigation.map((link) => link.label)).toEqual(['Home']);
+    expect(chrome.footerNavigation.flat().map((link) => link.label)).toEqual(['About']);
   });
 });
 
@@ -164,6 +198,50 @@ describe('social links', () => {
 
     expect(email?.href).toMatch(/^mailto:/);
     expect(email?.label).toBe('Email');
+  });
+
+  it('comes from the social-links collection, in order and nothing else, when it exists', async () => {
+    const items = [
+      { ...footerNavigationListItems[0], slug: 'ig', title: 'Instagram' },
+      { ...footerNavigationListItems[0], slug: 'fb', title: 'Facebook' },
+    ] as unknown as MarvinEntry[];
+    const { marvin } = chromeWith(
+      {},
+      {
+        collections: { ...NAV_COLLECTIONS, 'social-links': items },
+        entries: {
+          ...NAV_READS,
+          ig: { ...items[0], data: { href: 'https://www.instagram.com/grace' } },
+          fb: { ...items[1], data: { href: 'https://facebook.com/grace', icon: 'fb-square' } },
+        },
+      }
+    );
+    const chrome = await marvin.getSiteChrome();
+
+    expect(chrome.socialLinks.map((link) => [link.label, link.href, link.icon])).toEqual([
+      ['Instagram', 'https://www.instagram.com/grace', 'instagram'],
+      ['Facebook', 'https://facebook.com/grace', 'fb-square'],
+    ]);
+  });
+
+  it('is empty when the social-links collection is emptied', async () => {
+    const { marvin } = chromeWith(
+      {
+        fallback: {
+          socialLinks: [{ label: 'Instagram', href: 'https://instagram.com/x', icon: 'instagram' }],
+        },
+      },
+      { collections: { ...NAV_COLLECTIONS, 'social-links': [] } }
+    );
+    const chrome = await marvin.getSiteChrome();
+
+    expect(chrome.socialLinks).toEqual([]);
+  });
+
+  it('names an icon from the link when the entry has none', () => {
+    expect(socialIconFor('https://m.facebook.com/a', 'FB')).toBe('facebook');
+    expect(socialIconFor('mailto:a@b.c', 'Mail')).toBe('email');
+    expect(socialIconFor('/contact', 'Contact')).toBe('contact');
   });
 
   it('title-cases a social key', () => {

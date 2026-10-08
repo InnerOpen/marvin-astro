@@ -47,8 +47,13 @@ export function createFakeClient(setup: FakeClientSetup = {}): FakeClient {
         record('collections.list', () =>
           Object.keys(setup.collections ?? {}).map((slug) => ({ slug, name: slug }))
         ),
+      // Like the SDK: an unknown slug (a 404) is `[]`, not an error.
       get: async (slug: string) =>
-        record(`collections.get:${slug}`, () => ({ slug, entries: setup.collections?.[slug] ?? [] })),
+        record(`collections.get:${slug}`, () =>
+          setup.collections && slug in setup.collections
+            ? { slug, entries: setup.collections[slug] }
+            : []
+        ),
       entries: async (slug: string, options?: { expand?: 'full' }) => {
         const expanded = options?.expand === 'full' ? setup.expandedCollections?.[slug] : undefined;
         if (options?.expand === 'full') calls.push(`collections.entries.expand:${slug}`);
