@@ -1,3 +1,17 @@
+# [2.0.0](https://github.com/InnerOpen/marvin-astro/compare/v1.4.0...v2.0.0) (2026-10-18)
+
+
+* feat!: drop asset and resource fetchers and site asset-slug resolution ([32c796a](https://github.com/InnerOpen/marvin-astro/commit/32c796a23bbe0004c93d179fa4d70e7bb7532f60))
+
+
+### BREAKING CHANGES
+
+* fetcher.assets(), fetcher.asset() and fetcher.resources() are removed
+(marvin.fetch.*). getSite() no longer looks up asset slugs for logo, favicon, seo.image or
+metadata.brand.*: logo, favicon and seo.image are used as returned, and site.brand now holds
+only brand values that are already URLs, root-relative paths or data URIs. Bare brand slugs
+are left out.
+
 # [1.4.0](https://github.com/InnerOpen/marvin-astro/compare/v1.3.0...v1.4.0) (2026-10-08)
 
 
