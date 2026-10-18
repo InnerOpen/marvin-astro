@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { buildFallbackSite, buildSeo } from '../src/site.js';
 import { createMarvinContent } from '../src/index.js';
 import { createFakeClient, networkError, quietLogger } from './support/fakeClient.js';
-import { fakeAsset, marvinSite } from './support/fixtures.js';
+import { marvinSite } from './support/fixtures.js';
 import type { MarvinSite } from '@inneropen/marvin-sdk';
 
 const CONNECTION = {
@@ -20,14 +20,8 @@ const STATIC_SITE = {
   social: { instagram: 'https://instagram.com/static' },
 };
 
-const BRAND_ASSETS = {
-  'mb-monogram': fakeAsset('mb-monogram', 'https://cdn.test/monogram.svg'),
-  'mb-favicon': fakeAsset('mb-favicon', 'https://cdn.test/favicon.png'),
-  'maker-stamp-round': fakeAsset('maker-stamp-round', 'https://cdn.test/seal.svg'),
-};
-
 function siteWith(site: MarvinSite | null, options: Record<string, unknown> = {}) {
-  const fake = createFakeClient({ site, assets: BRAND_ASSETS });
+  const fake = createFakeClient({ site });
   const marvin = createMarvinContent({
     ...CONNECTION,
     createClient: () => fake.client,
@@ -125,8 +119,8 @@ describe('getSite', () => {
     expect(site.social.instagram).toContain('instagram.com');
   });
 
-  it('resolves every brand slug to a URL in one pass', async () => {
-    const { marvin } = siteWith(marvinSite);
+  it('uses the resolved logo, favicon and seal URLs as-is', async () => {
+    const { marvin, fake } = siteWith(marvinSite);
     const site = await marvin.getSite();
 
     expect(site.brand?.logo).toBe('https://cdn.test/monogram.svg');
@@ -135,15 +129,27 @@ describe('getSite', () => {
     expect(site.logo).toBe('https://cdn.test/monogram.svg');
     expect(site.favicon).toBe('https://cdn.test/favicon.png');
     expect(site.seal).toBe('https://cdn.test/seal.svg');
-    // Slugs that resolve to nothing are dropped, not stored as undefined.
-    expect(Object.values(site.brand ?? {}).every(Boolean)).toBe(true);
+    expect(site.seo.image).toBe('https://cdn.test/monogram.svg');
+    // No asset lookups: the site payload already carries URLs.
+    expect(fake.countOf('assets')).toBe(0);
   });
 
-  it('resolves an og:image given as a bare asset slug', async () => {
-    const { marvin } = siteWith(marvinSite);
+  it('leaves out brand entries that are bare slugs (Marvin no longer serves assets by slug)', async () => {
+    const withSlugs = {
+      ...marvinSite,
+      site: {
+        ...marvinSite.site,
+        metadataJson: {
+          brand: { logo: 'mb-monogram', paperFold: ' /assets/paper-fold.png ', stamp: 'data:image/svg+xml,x' },
+        },
+      },
+    } as unknown as MarvinSite;
+    const { marvin } = siteWith(withSlugs);
     const site = await marvin.getSite();
 
-    expect(site.seo.image).toBe('https://cdn.test/monogram.svg');
+    expect(site.brand).toEqual({ paperFold: '/assets/paper-fold.png', stamp: 'data:image/svg+xml,x' });
+    // Top-level logo still comes from the site config.
+    expect(site.logo).toBe('https://cdn.test/monogram.svg');
   });
 
   it('leaves an og:image that is already a URL or path alone', async () => {
@@ -159,48 +165,17 @@ describe('getSite', () => {
     expect((await marvin.getSite()).seo.image).toBe('/og/default.png');
   });
 
-  it('resolves top-level site_logo / site_favicon given as bare asset slugs', async () => {
-    const withSlugChrome = {
-      workspace: { slug: 'ws', name: 'WS' },
-      site: { title: 'T', locale: 'en-US', timezone: 'UTC', logo: 'chrome-logo', favicon: 'chrome-favicon', metadataJson: {} },
-    } as unknown as MarvinSite;
-    const fake = createFakeClient({
-      site: withSlugChrome,
-      assets: {
-        'chrome-logo': fakeAsset('chrome-logo', 'https://cdn.test/chrome-logo.svg'),
-        'chrome-favicon': fakeAsset('chrome-favicon', 'https://cdn.test/chrome-favicon.png'),
-      },
-    });
-    const marvin = createMarvinContent({ ...CONNECTION, createClient: () => fake.client, site: { fallback: STATIC_SITE } });
-    const site = await marvin.getSite();
-
-    expect(site.logo).toBe('https://cdn.test/chrome-logo.svg');
-    expect(site.favicon).toBe('https://cdn.test/chrome-favicon.png');
-  });
-
   it('leaves a top-level logo/favicon that is already a URL or path alone', async () => {
     const withUrlChrome = {
       workspace: { slug: 'ws', name: 'WS' },
       site: { title: 'T', locale: 'en-US', timezone: 'UTC', logo: 'https://cdn.test/x.svg', favicon: '/favicon.ico', metadataJson: {} },
     } as unknown as MarvinSite;
-    const fake = createFakeClient({ site: withUrlChrome, assets: {} });
+    const fake = createFakeClient({ site: withUrlChrome });
     const marvin = createMarvinContent({ ...CONNECTION, createClient: () => fake.client, site: { fallback: STATIC_SITE } });
     const site = await marvin.getSite();
 
     expect(site.logo).toBe('https://cdn.test/x.svg');
     expect(site.favicon).toBe('/favicon.ico');
-  });
-
-  it('keeps a top-level logo slug with no matching asset as-is', async () => {
-    const withMissing = {
-      workspace: { slug: 'ws', name: 'WS' },
-      site: { title: 'T', locale: 'en-US', timezone: 'UTC', logo: 'no-such-asset', metadataJson: {} },
-    } as unknown as MarvinSite;
-    const fake = createFakeClient({ site: withMissing, assets: {} });
-    const marvin = createMarvinContent({ ...CONNECTION, createClient: () => fake.client, site: { fallback: STATIC_SITE } });
-    const site = await marvin.getSite();
-
-    expect(site.logo).toBe('no-such-asset');
   });
 
   it('falls back to static identity when the backend is unreachable', async () => {
@@ -264,14 +239,13 @@ describe('getSite', () => {
     expect((await siteWith(marvinSite).marvin.getSite()).embeds).toBeUndefined();
   });
 
-  it('memoizes so brand resolution happens once per process', async () => {
+  it('memoizes so the site is loaded once per process', async () => {
     const { marvin, fake } = siteWith(marvinSite);
 
     await Promise.all([marvin.getSite(), marvin.getSite()]);
     await marvin.getSite();
 
     expect(fake.countOf('getSite')).toBe(1);
-    expect(fake.countOf('assets.get:mb-monogram')).toBe(1);
 
     marvin.reset();
     await marvin.getSite();

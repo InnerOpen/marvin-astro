@@ -154,7 +154,6 @@ describe('fetcher guards', () => {
     expect(await fetcher.collections()).toEqual([]);
     expect(await fetcher.entry('anything')).toBeNull();
     expect(await fetcher.site()).toBeNull();
-    expect(await fetcher.asset('logo')).toBeNull();
     expect(await fetcher.collectionEntriesFallback(['a', 'b'])).toEqual([]);
   });
 });

@@ -8,8 +8,8 @@
         "tagline": "Unnecessarily well-made",
         "description": "Well-made projects, bench notes, and field-tested clothing.",
         "canonicalUrl": "https://mashandburnco.com",
-        "logo": null,
-        "favicon": null,
+        "logo": "https://cdn.test/monogram.svg",
+        "favicon": "https://cdn.test/favicon.png",
         "locale": "en-US",
         "timezone": "America/New_York",
         "contactEmail": "hello@mashandburnco.com",
@@ -32,7 +32,7 @@
                 "bench notes"
             ],
             "robots": "index,follow",
-            "image": "mb-monogram",
+            "image": "https://cdn.test/monogram.svg",
             "imageAlt": "Mash & Burn Co. monogram",
             "ogType": "website",
             "siteName": "Mash & Burn Co.",
@@ -51,9 +51,9 @@
         },
         "metadataJson": {
             "brand": {
-                "logo": "mb-monogram",
-                "favicon": "mb-favicon",
-                "seal": "maker-stamp-round",
+                "logo": "https://cdn.test/monogram.svg",
+                "favicon": "https://cdn.test/favicon.png",
+                "seal": "https://cdn.test/seal.svg",
                 "hangTag": "hang-tag",
                 "paperGrain": "paper-grain",
                 "paperLaidLines": "paper-laid-lines",
@@ -81,7 +81,7 @@
                     "bench notes"
                 ],
                 "robots": "index,follow",
-                "image": "mb-monogram",
+                "image": "https://cdn.test/monogram.svg",
                 "imageAlt": "Mash & Burn Co. monogram",
                 "ogType": "website",
                 "siteName": "Mash & Burn Co.",

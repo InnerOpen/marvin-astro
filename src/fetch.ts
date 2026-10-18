@@ -8,9 +8,7 @@ import type {
   Collection,
   CollectionEntry,
   Entry,
-  MarvinAsset,
   MarvinEntry,
-  MarvinResource,
   MarvinSite,
   PublishedCollectionSummary,
   Workspace,
@@ -219,18 +217,6 @@ export function createFetcher(backend: MarvinBackend) {
 
     workspace(): Promise<Workspace | null> {
       return guarded('Workspace', null, () => backend.client().getWorkspace());
-    },
-
-    assets(type?: string): Promise<MarvinAsset[]> {
-      return guarded('Assets', [], () => backend.client().assets.list({ type }));
-    },
-
-    asset(slugOrId: string): Promise<MarvinAsset | null> {
-      return guarded(`Asset "${slugOrId}"`, null, () => backend.client().assets.get(slugOrId));
-    },
-
-    resources(resourceType?: string): Promise<MarvinResource[]> {
-      return guarded('Resources', [], () => backend.client().resources.list({ resourceType }));
     },
   };
 }

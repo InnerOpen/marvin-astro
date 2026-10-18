@@ -5,7 +5,7 @@
  */
 
 import { Entry } from '@inneropen/marvin-sdk';
-import type { CollectionEntry, MarvinAsset, MarvinEntry, MarvinSite } from '@inneropen/marvin-sdk';
+import type { CollectionEntry, MarvinEntry, MarvinSite } from '@inneropen/marvin-sdk';
 
 import collectionPayload from '../fixtures/collection-entries.json';
 import footerPayload from '../fixtures/footer-navigation-entries.json';
@@ -57,6 +57,3 @@ export function asEntry(raw: MarvinEntry): Entry {
   return new Entry(raw);
 }
 
-export function fakeAsset(slug: string, publicUrl: string): MarvinAsset {
-  return { slug, name: slug, publicUrl } as unknown as MarvinAsset;
-}

@@ -5,7 +5,7 @@
  */
 
 import { Entry } from '@inneropen/marvin-sdk';
-import type { MarvinAsset, MarvinEntry, MarvinSite } from '@inneropen/marvin-sdk';
+import type { MarvinEntry, MarvinSite } from '@inneropen/marvin-sdk';
 import { asEntry } from './fixtures.js';
 
 export type FakeClientSetup = {
@@ -20,7 +20,6 @@ export type FakeClientSetup = {
   /** Entry slug → the full read for that entry. */
   entries?: Record<string, MarvinEntry>;
   site?: MarvinSite | null;
-  assets?: Record<string, MarvinAsset>;
   /** Throw this on every call — use a network-shaped message to exercise the latch. */
   throws?: Error;
 };
@@ -69,14 +68,6 @@ export function createFakeClient(setup: FakeClientSetup = {}): FakeClient {
       }),
     getSite: async () => record('getSite', () => setup.site ?? null),
     getWorkspace: async () => record('getWorkspace', () => ({})),
-    assets: {
-      list: async () => record('assets.list', () => Object.values(setup.assets ?? {})),
-      get: async (slugOrId: string) =>
-        record(`assets.get:${slugOrId}`, () => setup.assets?.[slugOrId] ?? null),
-    },
-    resources: {
-      list: async () => record('resources.list', () => []),
-    },
   };
 
   return {

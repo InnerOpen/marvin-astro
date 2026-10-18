@@ -93,11 +93,11 @@ export type ApiSite = {
   canonicalUrl?: string;
   logo?: string;
   favicon?: string;
-  /** Round maker's stamp / seal — resolved from `site_metadata_json.brand.seal` (asset slug). */
+  /** Round maker's stamp / seal — `site_metadata_json.brand.seal`, when it is a URL. */
   seal?: string;
   /**
-   * Brand-asset registry: every `site_metadata_json.brand.<name>` slug resolved to its URL.
-   * Add a shared asset with one config line; components read `site.brand.<name>`.
+   * Brand-asset registry: every `site_metadata_json.brand.<name>` that is a URL, path or data URI,
+   * used as-is. Bare asset slugs are left out (Marvin no longer serves assets by slug).
    */
   brand?: Record<string, string>;
   locale: string;

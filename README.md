@@ -132,13 +132,15 @@ entry's image assets, then the list item's `featuredAsset`.
 ## Site and chrome
 
 ```ts
-const site = await marvin.getSite();       // identity, SEO, brand assets — memoized
+const site = await marvin.getSite();       // identity, SEO, logo/favicon URLs — memoized
 const chrome = await marvin.getSiteChrome(); // nav, footer, legal, social, inquiry — memoized
 ```
 
-`getSite()` resolves every `site_metadata_json.brand.<name>` asset slug to a URL in one pass, so
-a site adds a shared brand asset with one config line and reads `site.brand.<name>` — no code
-change per asset. `logo`, `favicon` and `seal` are aliased onto the top level.
+`getSite()` takes `logo`, `favicon` and `seo.image` as the URLs Marvin now returns (no asset
+lookups). `site.brand.<name>` collects the `site_metadata_json.brand.<name>` values that are
+URLs, root-relative paths or data URIs, used as-is; bare asset slugs are left out because the
+publishing API no longer serves assets by slug. `brand.logo`, `brand.favicon` and `brand.seal`
+win over the top-level `logo`/`favicon`/`seal`.
 
 `getSiteChrome()` reads `main-navigation` and `footer-navigation` collections, splits
 `role: 'legal'` entries into `legalLinks`, and groups the rest into footer columns. Social links

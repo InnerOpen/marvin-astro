@@ -3,14 +3,14 @@
  *
  * Marvin's site configuration is optional almost everywhere; a template that had to guard every
  * field would be unreadable. This resolves it once into an `ApiSite` where title, description,
- * siteName, locale and timezone are always present, and where brand asset slugs have already
- * become URLs.
+ * siteName, locale and timezone are always present. Logo, favicon and SEO image are the URLs
+ * Marvin returns, used as-is.
  */
 
 import type { MarvinSite, SiteConfiguration } from '@inneropen/marvin-sdk';
 import { siteEmbeds } from './embeds.js';
 import type { MarvinFetcher } from './fetch.js';
-import { asRecord, asString, assetUrl } from './normalize.js';
+import { asRecord, asString } from './normalize.js';
 import type { ApiSeo, ApiSite } from './types.js';
 
 export type SiteOptions = {
@@ -135,8 +135,9 @@ function transformMarvinSite(marvinSite: MarvinSite, fallback: ApiSite): ApiSite
   };
 }
 
-function looksLikeAssetSlug(value: string): boolean {
-  return !/^https?:\/\//.test(value) && !value.startsWith('/') && !value.startsWith('data:');
+/** A usable image reference: an absolute URL, a root-relative path or a data URI. */
+function isUrlLike(value: string): boolean {
+  return /^https?:\/\//.test(value) || value.startsWith('/') || value.startsWith('data:');
 }
 
 export type SiteLoader = {
@@ -155,18 +156,6 @@ export function createSiteLoader(fetcher: MarvinFetcher, options: SiteOptions = 
   let promise: Promise<ApiSite> | null = null;
   let fromMarvin = false;
 
-  async function resolveAssetSlug(slug: string | undefined): Promise<string | undefined> {
-    if (!slug) return undefined;
-    return assetUrl(await fetcher.asset(slug));
-  }
-
-  // Resolve a value only when it looks like a bare asset slug; a URL/path/data URI (or a slug with
-  // no matching asset) is returned unchanged.
-  async function resolveMaybeSlug(value: string | undefined): Promise<string | undefined> {
-    if (!value || !looksLikeAssetSlug(value)) return value;
-    return (await resolveAssetSlug(value)) ?? value;
-  }
-
   async function load(): Promise<ApiSite> {
     const marvinSite = await fetcher.site();
     fromMarvin = marvinSite !== null;
@@ -174,46 +163,21 @@ export function createSiteLoader(fetcher: MarvinFetcher, options: SiteOptions = 
 
     const site = transformMarvinSite(marvinSite, fallback);
 
-    // Brand-asset registry: resolve EVERY `brand.<name>` slug → URL in one pass. A site adds a
-    // shared asset with one config line (`brand.paperFold = "paper-fold"`) plus an upload;
-    // components then read `site.brand.paperFold`. No code change per asset.
-    const brandPairs = Object.entries(asRecord(site.metadata.brand)).filter(
-      (entry): entry is [string, string] =>
-        typeof entry[1] === 'string' && entry[1].trim().length > 0
-    );
-    const resolved = await Promise.all(
-      brandPairs.map(async ([name, slug]) => [name, await resolveAssetSlug(slug)] as const)
-    );
+    // Brand-asset registry: every `brand.<name>` that is a URL (or root-relative path / data URI),
+    // used as-is. Marvin no longer serves assets by slug, so a bare slug can't be resolved here and
+    // is left out; `site.logo`, `site.favicon` and `site.seo.image` arrive already resolved.
     const brand: Record<string, string> = {};
-    const brandBySlug = new Map<string, string>();
-    for (const [index, [name, url]] of resolved.entries()) {
-      if (!url) continue;
-      brand[name] = url;
-      brandBySlug.set(brandPairs[index][1], url);
+    for (const [name, value] of Object.entries(asRecord(site.metadata.brand))) {
+      if (typeof value === 'string' && isUrlLike(value.trim())) brand[name] = value.trim();
     }
-
-    // The og:image may be given as a bare asset slug too. It is usually one of the brand slugs
-    // (a monogram, a logo), so check what was just resolved before fetching it again.
-    const rawImage = site.seo.image;
-    const ogImage =
-      rawImage && looksLikeAssetSlug(rawImage)
-        ? (brandBySlug.get(rawImage) ?? (await resolveAssetSlug(rawImage)))
-        : undefined;
-
-    // The top-level `site_logo` / `site_favicon` fields may be bare asset slugs too (like brand.*
-    // and og:image) — resolve them so they can reference an uploaded asset by slug. The brand-map
-    // aliases still win when present.
-    const logo = brand.logo ?? (await resolveMaybeSlug(site.logo));
-    const favicon = brand.favicon ?? (await resolveMaybeSlug(site.favicon));
 
     return {
       ...site,
       brand,
       // Convenience aliases for common callers; all of these also live in `site.brand`.
-      logo,
-      favicon,
+      logo: brand.logo ?? site.logo,
+      favicon: brand.favicon ?? site.favicon,
       seal: brand.seal ?? site.seal,
-      seo: { ...site.seo, image: ogImage ?? site.seo.image },
     };
   }
 

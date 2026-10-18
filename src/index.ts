@@ -70,7 +70,7 @@ export function createMarvinContent(options: MarvinContentOptions = {}) {
     /** True when Marvin is configured and not currently latched out as unreachable. */
     hasBackend: () => backend.hasBackend(),
 
-    /** Resolved site identity, SEO and brand assets. Memoized per process. */
+    /** Site identity, SEO and logo/favicon URLs. Memoized per process. */
     getSite(): Promise<ApiSite> {
       return siteLoader.get();
     },
