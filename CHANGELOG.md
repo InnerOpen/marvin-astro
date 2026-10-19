@@ -1,3 +1,17 @@
+# [2.1.0](https://github.com/InnerOpen/marvin-astro/compare/v2.0.0...v2.1.0) (2026-10-19)
+
+
+### Bug Fixes
+
+* equal-width consent buttons that stack full-width on mobile ([5315c70](https://github.com/InnerOpen/marvin-astro/commit/5315c703cde31c8f8fa96e3174c7aa0050ddea54))
+* inline consent.css where the banner renders ([5082df9](https://github.com/InnerOpen/marvin-astro/commit/5082df9e9f227ce228c9ebdbf7b9e2c6c2c0af2b))
+
+
+### Features
+
+* consent banner with a zero-import consent runtime ([676d02c](https://github.com/InnerOpen/marvin-astro/commit/676d02c204829d9d8764df77bf70cd8eba2c3812))
+* render site.privacy with PrivacyPolicy, CookieTable and ProcessorTable ([d039ef0](https://github.com/InnerOpen/marvin-astro/commit/d039ef01858fc74bd072d029ae457b52953aca6d))
+
 # [2.0.0](https://github.com/InnerOpen/marvin-astro/compare/v1.4.0...v2.0.0) (2026-10-18)
 
 
