@@ -1,0 +1,97 @@
+---
+/**
+ * CookieTable — the cookies and storage entries a site sets, one table per category.
+ *
+ * Server-rendered, no JavaScript. Pass `site.privacy.cookies` (or a pre-filtered list); `category`
+ * narrows it to one table. When any listed entry needs consent (the consent banner is on), the
+ * `marvin-consent` entry the banner itself stores is added as a necessary row unless it is
+ * already listed or `includeConsentEntry={false}`, and a <noscript> notice explains why optional
+ * cookies are off without JavaScript.
+ *
+ * Styles come from `privacy.css`: zero specificity, themeable with `--marvin-privacy-*`.
+ */
+import type { CookieCategory, PrivacyCookie } from '../privacy.js';
+import { COOKIE_CATEGORIES, cookiesNeedConsent } from '../privacy.js';
+import {
+  CATEGORY_DESCRIPTIONS,
+  CONSENT_STORAGE_KEY,
+  DEFAULT_MAX_AGE_DAYS,
+  formatMaxAge,
+  privacyLabels,
+  type PrivacyLabels,
+} from './privacy-text.js';
+import './privacy.css';
+
+interface Props {
+  cookies: PrivacyCookie[] | null | undefined;
+  /** Render only this category. */
+  category?: CookieCategory;
+  /** Add the `marvin-consent` row when the banner is required. Default true. */
+  includeConsentEntry?: boolean;
+  /** Must match `<ConsentBanner maxAgeDays>`; shown as the consent entry's duration. */
+  maxAgeDays?: number;
+  labels?: Partial<Omit<PrivacyLabels, 'categories'>> & {
+    categories?: Partial<Record<CookieCategory, string>>;
+  };
+  class?: string;
+}
+
+const {
+  cookies: rawCookies,
+  category,
+  includeConsentEntry = true,
+  maxAgeDays = DEFAULT_MAX_AGE_DAYS,
+  class: className,
+} = Astro.props;
+const labels = privacyLabels(Astro.props.labels);
+const listed = rawCookies ?? [];
+const bannerRequired = cookiesNeedConsent(listed);
+
+const all: PrivacyCookie[] =
+  bannerRequired && includeConsentEntry && !listed.some((cookie) => cookie.name === CONSENT_STORAGE_KEY)
+    ? [
+        ...listed,
+        {
+          name: CONSENT_STORAGE_KEY,
+          provider: labels.thisSite,
+          purpose: labels.consentCookiePurpose,
+          duration: formatMaxAge(maxAgeDays),
+          category: 'necessary',
+        },
+      ]
+    : listed;
+
+const groups = COOKIE_CATEGORIES.filter((name) => !category || name === category)
+  .map((name) => ({ name, rows: all.filter((cookie) => cookie.category === name) }))
+  .filter((group) => group.rows.length > 0);
+---
+
+{bannerRequired && (
+  <noscript><p class="marvin-privacy__notice">{labels.noscript}</p></noscript>
+)}
+{groups.map((group) => (
+  <table class={['marvin-privacy__table', 'marvin-privacy__table--cookies', className].filter(Boolean).join(' ')} data-category={group.name}>
+    <caption>
+      {labels.categories[group.name]}
+      <small>{CATEGORY_DESCRIPTIONS[group.name]}</small>
+    </caption>
+    <thead>
+      <tr>
+        <th scope="col">{labels.cookieName}</th>
+        <th scope="col">{labels.provider}</th>
+        <th scope="col">{labels.purpose}</th>
+        <th scope="col">{labels.duration}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {group.rows.map((cookie) => (
+        <tr>
+          <th scope="row"><code>{cookie.name}</code></th>
+          <td data-label={labels.provider}>{cookie.provider}</td>
+          <td data-label={labels.purpose}>{cookie.purpose}</td>
+          <td data-label={labels.duration}>{cookie.duration}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+))}

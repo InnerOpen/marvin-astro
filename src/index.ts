@@ -137,6 +137,14 @@ export {
   type RenderMarkdownOptions,
 } from './markdown.js';
 export { entryEmbeds, findEmbed, siteEmbeds } from './embeds.js';
+export {
+  COOKIE_CATEGORIES,
+  CONSENT_CATEGORIES,
+  consentCategories,
+  consentVersion,
+  cookiesNeedConsent,
+  sitePrivacy,
+} from './privacy.js';
 export * from './normalize.js';
 export {
   createRepository,

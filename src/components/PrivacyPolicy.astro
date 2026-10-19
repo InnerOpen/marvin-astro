@@ -1,0 +1,118 @@
+---
+/**
+ * PrivacyPolicy — the structured half of a privacy / cookie policy page.
+ *
+ * Renders, from `site.privacy`: the entry's own prose (the default slot, e.g. the policy entry's
+ * body HTML), then the controller block, the processors table, the cookies tables and the
+ * "Last reviewed" date. Server-rendered, zero JavaScript. Sections with nothing to say are left
+ * out. `headingLevel` is the level of the section headings (sub-sections never go past h6).
+ *
+ * ```astro
+ * <PrivacyPolicy privacy={site.privacy}>
+ *   <Fragment set:html={entry.bodyHtml} />
+ * </PrivacyPolicy>
+ * ```
+ */
+import { formatDisplayDate } from '../format.js';
+import type { CookieCategory, SitePrivacy } from '../privacy.js';
+import { cookiesNeedConsent } from '../privacy.js';
+import CookieTable from './CookieTable.astro';
+import ProcessorTable from './ProcessorTable.astro';
+import { DEFAULT_MAX_AGE_DAYS, privacyLabels, type PrivacyLabels } from './privacy-text.js';
+import './privacy.css';
+
+interface Props {
+  privacy: SitePrivacy | null | undefined;
+  /** Level of the section headings, 1–6. Default 2. */
+  headingLevel?: 1 | 2 | 3 | 4 | 5 | 6;
+  includeConsentEntry?: boolean;
+  maxAgeDays?: number;
+  labels?: Partial<Omit<PrivacyLabels, 'categories'>> & {
+    categories?: Partial<Record<CookieCategory, string>>;
+  };
+  class?: string;
+}
+
+const {
+  privacy,
+  headingLevel = 2,
+  includeConsentEntry = true,
+  maxAgeDays = DEFAULT_MAX_AGE_DAYS,
+  class: className,
+} = Astro.props;
+const labels = privacyLabels(Astro.props.labels);
+
+const level = Math.min(6, Math.max(1, Math.trunc(headingLevel)));
+const Heading = `h${level}` as 'h2';
+const controller = privacy?.controller;
+const mailto = (email: string | undefined) =>
+  email && /^[^\s@<>"]+@[^\s@<>"]+$/.test(email) ? `mailto:${email}` : undefined;
+const contactHref = mailto(controller?.contactEmail);
+const dpoHref = mailto(controller?.dpoEmail);
+const lastReviewed = privacy?.consent.lastReviewed;
+const hasCookies = (privacy?.cookies.length ?? 0) > 0;
+const needsConsent = cookiesNeedConsent(privacy?.cookies ?? []);
+const hasSlot = Astro.slots.has('default');
+---
+
+{(privacy || hasSlot) && (
+  <div class={['marvin-privacy', className].filter(Boolean).join(' ')}>
+    {hasSlot && (
+      <div class="marvin-privacy__prose"><slot /></div>
+    )}
+
+    {controller && (
+      <section class="marvin-privacy__section" id="marvin-privacy-controller">
+        <Heading>{labels.controller}</Heading>
+        <dl class="marvin-privacy__facts">
+          <dt>{labels.legalName}</dt>
+          <dd>{controller.legalName}</dd>
+          {controller.address && (<><dt>{labels.address}</dt><dd>{controller.address}</dd></>)}
+          {controller.contactEmail && (
+            <>
+              <dt>{labels.contact}</dt>
+              <dd>{contactHref ? <a href={contactHref}>{controller.contactEmail}</a> : controller.contactEmail}</dd>
+            </>
+          )}
+          {controller.euRepresentative && (
+            <><dt>{labels.euRepresentative}</dt><dd>{controller.euRepresentative}</dd></>
+          )}
+          {controller.dpoEmail && (
+            <>
+              <dt>{labels.dpo}</dt>
+              <dd>{dpoHref ? <a href={dpoHref}>{controller.dpoEmail}</a> : controller.dpoEmail}</dd>
+            </>
+          )}
+        </dl>
+      </section>
+    )}
+
+    {privacy && privacy.processors.length > 0 && (
+      <section class="marvin-privacy__section" id="marvin-privacy-processors">
+        <Heading>{labels.processors}</Heading>
+        <ProcessorTable processors={privacy.processors} labels={Astro.props.labels} />
+      </section>
+    )}
+
+    {privacy && hasCookies && (
+      <section class="marvin-privacy__section" id="marvin-privacy-cookies">
+        <Heading>{labels.cookies}</Heading>
+        {needsConsent && (
+          <p><a href="#marvin-privacy-cookies" data-marvin-consent-open>{labels.changeSettings}</a></p>
+        )}
+        <CookieTable
+          cookies={privacy.cookies}
+          includeConsentEntry={includeConsentEntry}
+          maxAgeDays={maxAgeDays}
+          labels={Astro.props.labels}
+        />
+      </section>
+    )}
+
+    {lastReviewed && (
+      <p class="marvin-privacy__reviewed">
+        {labels.lastReviewed}: <time datetime={lastReviewed}>{formatDisplayDate(lastReviewed)}</time>
+      </p>
+    )}
+  </div>
+)}

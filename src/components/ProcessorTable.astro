@@ -1,0 +1,62 @@
+---
+/**
+ * ProcessorTable — third parties that handle visitor data on the site's behalf.
+ *
+ * Server-rendered, no JavaScript. Pass `site.privacy.processors`. Region and transfer basis show
+ * as Marvin stored them; DPA / privacy-policy links render only when they are http(s) URLs.
+ */
+import type { CookieCategory, PrivacyProcessor } from '../privacy.js';
+import { privacyLabels, type PrivacyLabels } from './privacy-text.js';
+import { safeLinkHref } from './embed-frame.js';
+import './privacy.css';
+
+interface Props {
+  processors: PrivacyProcessor[] | null | undefined;
+  labels?: Partial<Omit<PrivacyLabels, 'categories'>> & {
+    categories?: Partial<Record<CookieCategory, string>>;
+  };
+  class?: string;
+}
+
+const { processors, class: className } = Astro.props;
+const labels = privacyLabels(Astro.props.labels);
+const rows = (processors ?? []).map((processor) => ({
+  processor,
+  dpa: safeLinkHref(processor.dpaUrl),
+  privacy: safeLinkHref(processor.privacyUrl),
+}));
+---
+
+{rows.length > 0 && (
+  <table class={['marvin-privacy__table', 'marvin-privacy__table--processors', className].filter(Boolean).join(' ')}>
+    <thead>
+      <tr>
+        <th scope="col">{labels.processor}</th>
+        <th scope="col">{labels.purpose}</th>
+        <th scope="col">{labels.data}</th>
+        <th scope="col">{labels.region}</th>
+        <th scope="col">{labels.transferBasis}</th>
+        <th scope="col">{labels.links}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {rows.map(({ processor, dpa, privacy }) => (
+        <tr>
+          <th scope="row">{processor.name}</th>
+          <td data-label={labels.purpose}>{processor.purpose}</td>
+          <td data-label={labels.data}>{processor.dataCategories.join(', ')}</td>
+          <td data-label={labels.region}>{processor.region}</td>
+          <td data-label={labels.transferBasis}>{processor.transferBasis}</td>
+          <td data-label={labels.links}>
+            {(dpa || privacy) && (
+              <ul class="marvin-privacy__links">
+                {privacy && <li><a href={privacy} rel="noopener noreferrer">{labels.privacyPolicy}</a></li>}
+                {dpa && <li><a href={dpa} rel="noopener noreferrer">{labels.dpa}</a></li>}
+              </ul>
+            )}
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+)}

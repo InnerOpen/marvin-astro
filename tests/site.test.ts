@@ -3,6 +3,7 @@ import { buildFallbackSite, buildSeo } from '../src/site.js';
 import { createMarvinContent } from '../src/index.js';
 import { createFakeClient, networkError, quietLogger } from './support/fakeClient.js';
 import { marvinSite } from './support/fixtures.js';
+import { rawPrivacy } from './support/privacy.js';
 import type { MarvinSite } from '@inneropen/marvin-sdk';
 
 const CONNECTION = {
@@ -237,6 +238,23 @@ describe('getSite', () => {
 
     expect((await siteWith(odd).marvin.getSite()).embeds?.mode).toBe('click_to_load');
     expect((await siteWith(marvinSite).marvin.getSite()).embeds).toBeUndefined();
+  });
+
+  it('reads site.privacy from the typed field or the metadata blob, and omits it when absent', async () => {
+    const typed = {
+      ...marvinSite,
+      site: { ...marvinSite.site, privacy: rawPrivacy() },
+    } as unknown as MarvinSite;
+    const blob = {
+      ...marvinSite,
+      site: { ...marvinSite.site, metadataJson: { privacy: rawPrivacy() } },
+    } as unknown as MarvinSite;
+
+    const fromTyped = (await siteWith(typed).marvin.getSite()).privacy;
+    expect(fromTyped?.controller?.legalName).toBe('Mash & Burn Co.');
+    expect(fromTyped?.bannerRequired).toBe(true);
+    expect((await siteWith(blob).marvin.getSite()).privacy?.cookies).toHaveLength(3);
+    expect((await siteWith(marvinSite).marvin.getSite()).privacy).toBeUndefined();
   });
 
   it('memoizes so the site is loaded once per process', async () => {

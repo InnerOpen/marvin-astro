@@ -7,6 +7,7 @@
  */
 
 import type { MarvinSiteEmbeds } from './embeds.js';
+import type { SitePrivacy } from './privacy.js';
 import type {
   CollectionEntry,
   Entry,
@@ -111,6 +112,11 @@ export type ApiSite = {
    * Absent when the server predates media embeds.
    */
   embeds?: MarvinSiteEmbeds;
+  /**
+   * Privacy & cookie disclosures (`site.privacy`), normalized by `sitePrivacy`. Absent when the
+   * server predates them or none are configured.
+   */
+  privacy?: SitePrivacy;
   metadata: Record<string, unknown>;
 };
 
@@ -186,3 +192,12 @@ export type {
   MarvinEmbedStatus,
   MarvinSiteEmbeds,
 } from './embeds.js';
+export type {
+  ConsentCategory,
+  CookieCategory,
+  PrivacyConsent,
+  PrivacyController,
+  PrivacyCookie,
+  PrivacyProcessor,
+  SitePrivacy,
+} from './privacy.js';

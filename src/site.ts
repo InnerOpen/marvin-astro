@@ -9,6 +9,7 @@
 
 import type { MarvinSite, SiteConfiguration } from '@inneropen/marvin-sdk';
 import { siteEmbeds } from './embeds.js';
+import { sitePrivacy } from './privacy.js';
 import type { MarvinFetcher } from './fetch.js';
 import { asRecord, asString } from './normalize.js';
 import type { ApiSeo, ApiSite } from './types.js';
@@ -130,6 +131,13 @@ function transformMarvinSite(marvinSite: MarvinSite, fallback: ApiSite): ApiSite
     // Older servers and SDKs don't send it; `siteEmbeds` returns undefined then.
     embeds: siteEmbeds(
       (config as { embeds?: unknown }).embeds ?? (marvinSite as { embeds?: unknown }).embeds
+    ),
+    // Typed `config.privacy` when the SDK declares it (SDK 7.2+), else the raw blob under
+    // `metadata.privacy`; this package's SDK peer range predates the typed field, so read both.
+    privacy: sitePrivacy(
+      (config as { privacy?: unknown }).privacy ??
+        (marvinSite as { privacy?: unknown }).privacy ??
+        metadata.privacy
     ),
     metadata,
   };

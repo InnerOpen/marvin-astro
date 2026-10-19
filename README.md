@@ -258,6 +258,7 @@ this needs a newer SDK.
 |---|---|
 | `FormRenderer` | a public form from a submittable entry type's `formSchema`; unstyled, progressive-enhancement submit |
 | `Embed`, `LinkCard`, `EmbedLoader` | media embeds (above) |
+| `PrivacyPolicy`, `CookieTable`, `ProcessorTable` | privacy & cookie policy rendering ([below](#privacy--cookies)) |
 | `EntryRenderer` | picks the renderer for an entry from its entry type's `rendering` |
 | `PageRenderer`, `ArticleRenderer`, `FaqRenderer`, `NavigationRenderer` | unstyled, semantic core renderers with `data-renderer`/`data-role` hooks |
 
@@ -287,6 +288,38 @@ Options: `registry` (required), `apiUrl`, `siteToken` (default to the `MARVIN_*`
 
 Marvin's system entry types name their renderer package `@inneropen/marvin-renderers-core`; the
 core renderers still answer to that name (and to `@inneropen/marvin-astro`).
+
+## Privacy & cookies
+
+Marvin keeps the facts a privacy/cookie policy needs (`site.privacy`: the controller, processors and
+the cookies/storage the site sets). `site.privacy` is read tolerantly (typed field or
+`metadata.privacy`, camelCase or snake_case), so it needs no SDK bump; it is `undefined` until a
+workspace configures it. Not legal advice: you decide the text and the classification.
+
+```astro
+---
+import { PrivacyPolicy } from '@inneropen/marvin-astro/components';
+const site = await marvin.getSite();
+const entry = await policies.bySlug('privacy'); // your policy entry (prose)
+---
+<PrivacyPolicy privacy={site.privacy} headingLevel={2}>
+  <Fragment set:html={entry.bodyHtml} />
+</PrivacyPolicy>
+```
+
+| Component | Renders |
+|---|---|
+| `PrivacyPolicy` | the entry prose (default slot), controller block, processors, cookies, "Last reviewed" |
+| `CookieTable` | `cookies`, one table per category (`category` narrows it); adds the `marvin-consent` storage row as necessary when a banner is required (`includeConsentEntry={false}` to skip) |
+| `ProcessorTable` | `processors`: region, transfer basis, DPA/privacy links (http(s) only) |
+
+All server-rendered with zero JavaScript. Styling is `privacy.css`: zero-specificity `:where()` rules
+you override freely, themed with `--marvin-privacy-gap | -border | -head-bg | -muted | -pad`; tables
+stack below 600px. Every string has a neutral English default; pass `labels={{ ... }}` to change it.
+
+`sitePrivacy(raw)` and `consentVersion(privacy)` are exported from the package root. The version is
+a hash of the sorted non-necessary `category|name|provider` triples, so rewording a purpose or
+moving `lastReviewed` never re-asks, while adding, removing or re-categorising a cookie does.
 
 ## Migrating from @inneropen/marvin-renderers-core
 
@@ -362,7 +395,7 @@ verification tags. No styling, no site coupling.
 
 Beyond `createMarvinContent`, the pieces are usable on their own: `createBackend`,
 `createFetcher`, `createRepository`, `createSiteLoader`, `createChromeLoader`,
-`createFieldAccessor`, `createMarkdownRenderer`, `entryEmbeds`, `findEmbed`, `siteEmbeds`,
+`createFieldAccessor`, `createMarkdownRenderer`, `entryEmbeds`, `findEmbed`, `siteEmbeds`, `sitePrivacy`, `consentVersion`,
 `formatDisplayDate`, `selectValuesForPage`, and the whole `normalize` surface.
 
 ## Development

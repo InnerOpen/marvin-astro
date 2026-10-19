@@ -22,6 +22,9 @@ export { default as FormRenderer } from './FormRenderer.astro';
 export { default as Embed } from './Embed.astro';
 export { default as LinkCard } from './LinkCard.astro';
 export { default as EmbedLoader } from './EmbedLoader.astro';
+export { default as CookieTable } from './CookieTable.astro';
+export { default as ProcessorTable } from './ProcessorTable.astro';
+export { default as PrivacyPolicy } from './PrivacyPolicy.astro';
 export { marvinIntegration } from './integration.js';
 export { iframeAttributes, installEmbedLoader, isAllowedFrameSrc } from './embed-frame.js';
 

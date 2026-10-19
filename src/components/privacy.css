@@ -1,0 +1,123 @@
+/*
+ * Base styles for the privacy & cookie policy components.
+ *
+ * Every selector is wrapped in :where() so it carries zero specificity: any site rule wins.
+ * Theme through the custom properties below rather than overriding the rules.
+ *
+ *   --marvin-privacy-gap          space between sections (default 2rem)
+ *   --marvin-privacy-border       table rule colour (default currentColor at 20%)
+ *   --marvin-privacy-head-bg      table header background (default currentColor at 6%)
+ *   --marvin-privacy-muted        secondary text (default currentColor at 75%)
+ *   --marvin-privacy-pad          table cell padding (default 0.5rem 0.75rem)
+ *   --marvin-privacy-breakpoint   documentation only; tables stack below 600px
+ *
+ * Markup:
+ *   div.marvin-privacy
+ *     section.marvin-privacy__section  (controller, processors, cookies)
+ *       dl.marvin-privacy__facts
+ *       table.marvin-privacy__table.marvin-privacy__table--{cookies|processors}
+ */
+
+:where(.marvin-privacy) {
+  display: grid;
+  gap: var(--marvin-privacy-gap, 2rem);
+}
+
+:where(.marvin-privacy__section > :first-child) {
+  margin-top: 0;
+}
+
+:where(.marvin-privacy__facts) {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.25rem 1.5rem;
+  margin: 0;
+}
+
+:where(.marvin-privacy__facts dt) {
+  font-weight: 600;
+}
+
+:where(.marvin-privacy__facts dd) {
+  margin: 0;
+}
+
+:where(.marvin-privacy__notice, .marvin-privacy__reviewed) {
+  color: var(--marvin-privacy-muted, color-mix(in srgb, currentColor 75%, transparent));
+}
+
+:where(.marvin-privacy__table) {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 0 1.5rem;
+  text-align: left;
+}
+
+:where(.marvin-privacy__table caption) {
+  text-align: left;
+  font-weight: 600;
+  padding-bottom: 0.5rem;
+}
+
+:where(.marvin-privacy__table caption small) {
+  display: block;
+  font-weight: 400;
+  color: var(--marvin-privacy-muted, color-mix(in srgb, currentColor 75%, transparent));
+}
+
+:where(.marvin-privacy__table th, .marvin-privacy__table td) {
+  padding: var(--marvin-privacy-pad, 0.5rem 0.75rem);
+  border-bottom: 1px solid var(--marvin-privacy-border, color-mix(in srgb, currentColor 20%, transparent));
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+
+:where(.marvin-privacy__table thead th) {
+  background: var(--marvin-privacy-head-bg, color-mix(in srgb, currentColor 6%, transparent));
+}
+
+:where(.marvin-privacy__table tbody th) {
+  font-weight: 600;
+}
+
+:where(.marvin-privacy__links) {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Below 600px each row becomes a stacked card: the header row is hidden visually (still read by
+   assistive tech) and every cell carries its column name from data-label. */
+@media (max-width: 599px) {
+  :where(.marvin-privacy__table, .marvin-privacy__table tbody, .marvin-privacy__table tr, .marvin-privacy__table th, .marvin-privacy__table td) {
+    display: block;
+  }
+
+  :where(.marvin-privacy__table thead) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  :where(.marvin-privacy__table tr) {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--marvin-privacy-border, color-mix(in srgb, currentColor 20%, transparent));
+  }
+
+  :where(.marvin-privacy__table th, .marvin-privacy__table td) {
+    border-bottom: 0;
+    padding-block: 0.125rem;
+  }
+
+  :where(.marvin-privacy__table td[data-label])::before {
+    content: attr(data-label) ': ';
+    font-weight: 600;
+  }
+
+  :where(.marvin-privacy__facts) {
+    grid-template-columns: 1fr;
+  }
+}
