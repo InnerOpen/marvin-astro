@@ -5,7 +5,9 @@
  */
 import type { ConsentCategory } from '../privacy.js';
 import type { ConsentLabels } from './privacy-text.js';
-import './consent.css';
+// Inlined where it renders rather than imported: Astro ships an imported stylesheet on every page
+// that merely imports the component, which would put banner CSS on banner-free sites.
+import consentCss from './consent.css?raw';
 
 interface Props {
   version: string;
@@ -15,10 +17,11 @@ interface Props {
   policyHref?: string;
   maxAgeDays: number;
   embeds?: string;
+  inlineStyles?: boolean;
   class?: string;
 }
 
-const { version, categories, cookieNames, labels, policyHref, maxAgeDays, embeds, class: className } = Astro.props;
+const { version, categories, cookieNames, labels, policyHref, maxAgeDays, embeds, inlineStyles = true, class: className } = Astro.props;
 // A site-relative path is a normal policy link; anything that isn't http(s) once resolved
 // (javascript:, data:, …) is dropped.
 function safeHref(value?: string): string | undefined {
@@ -30,8 +33,11 @@ function safeHref(value?: string): string | undefined {
   }
 }
 const href = safeHref(policyHref);
+// consent.css has no strings, so dropping comments and collapsing whitespace is safe.
+const css = consentCss.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\s+/g, ' ').trim();
 ---
 
+{inlineStyles && <style is:inline set:html={css} />}
 <div
   class={['marvin-consent', className].filter(Boolean).join(' ')}
   data-marvin-consent-banner

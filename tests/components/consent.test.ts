@@ -507,6 +507,14 @@ describe('<ConsentBanner>', () => {
     expect(html).not.toContain('javascript:');
   });
 
+  it('inlines its stylesheet where it renders, unless inlineStyles is false', async () => {
+    const html = await renderBanner({ privacy });
+    expect(html).toMatch(/<style>:where\(\.marvin-consent\) ?\{/);
+    expect(html).not.toContain('/*');
+    expect(await renderBanner({ privacy, inlineStyles: false })).not.toContain('<style');
+    expect((await renderBanner({ privacy: sitePrivacy({ cookies: NECESSARY_ONLY }) })).trim()).toBe('');
+  });
+
   it('applies label and maxAgeDays overrides and the embeds opt-in', async () => {
     const html = await renderBanner({
       privacy,

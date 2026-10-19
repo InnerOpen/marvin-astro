@@ -394,8 +394,11 @@ customise, save, settingsLink, policyLink, dialogTitle, dialogBody, categories, 
 Theme with `--marvin-consent-bg | -fg | -accent | -radius | -font | -shadow | -z` (zero-specificity
 `consent.css`; dark mode follows `prefers-color-scheme`). No consent log is kept anywhere.
 
-Astro note: `<ConsentBanner>` relies on Astro shipping a component's `<script>` and CSS only when it is
-rendered (Astro 5 behaviour). Check your build output on older Astro versions.
+`consent.css` is inlined as a `<style>` next to the banner markup, and the runtime `<script>` is only
+emitted with it, so a page without a banner carries neither (Astro 5 ships a component's `<script>` only
+where it renders but ships imported stylesheets wherever the component is merely imported, hence the
+inline style). Under a CSP without `style-src 'unsafe-inline'`, pass `inlineStyles={false}` and import
+`@inneropen/marvin-astro/components/consent.css` yourself. Check your build output on other Astro versions.
 
 ## Migrating from @inneropen/marvin-renderers-core
 

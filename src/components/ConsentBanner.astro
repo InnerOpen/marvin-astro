@@ -34,6 +34,12 @@ interface Props {
   maxAgeDays?: number;
   /** Also activate click-to-load embeds once this category is allowed. */
   embeds?: 'preferences' | 'analytics' | 'marketing';
+  /**
+   * Inline `consent.css` next to the markup (default), so it ships only where the banner renders.
+   * Set false to import `@inneropen/marvin-astro/components/consent.css` yourself, e.g. under a
+   * CSP that forbids inline styles.
+   */
+  inlineStyles?: boolean;
   /** Dev warning when `data-consent` markup exists but no banner renders. Default: dev builds. */
   warn?: boolean;
   class?: string;
@@ -44,6 +50,7 @@ const {
   policyHref,
   maxAgeDays = DEFAULT_MAX_AGE_DAYS,
   embeds,
+  inlineStyles = true,
   warn = import.meta.env?.DEV === true,
   class: className,
 } = Astro.props;
@@ -69,6 +76,7 @@ const cookieNames = Object.fromEntries(
     policyHref={policyHref}
     maxAgeDays={maxAgeDays}
     embeds={embeds}
+    inlineStyles={inlineStyles}
     class={className}
   />
 )}
