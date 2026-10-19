@@ -22,6 +22,7 @@ describe('CookieTable', () => {
     const html = await render(CookieTable, { cookies: privacy.cookies });
 
     expect(html.match(/<table/g)).toHaveLength(3);
+    expect(html.match(/<div class="marvin-privacy__table-wrap">/g)).toHaveLength(3);
     expect(html).toMatch(/<caption>\s*Necessary/);
     expect(html).toMatch(/<caption>\s*Analytics/);
     expect(html).toContain('<code>_ga*</code>');
@@ -150,6 +151,37 @@ describe('privacy.css', () => {
         expect(part.trim().startsWith(':where('), part).toBe(true);
       }
     }
+  });
+
+  const rule = (selectorPart: string) =>
+    [...css.replace(/\/\*[\s\S]*?\*\//g, '').matchAll(/([^{}]+)\{([^{}]*)\}/g)]
+      .filter((match) => match[1]!.includes(selectorPart))
+      .map((match) => match[2]!)
+      .join('\n');
+
+  it('wraps ordinary words at word boundaries, never mid-word', () => {
+    const cells = rule('.marvin-privacy__table th, .marvin-privacy__table td');
+    expect(cells).toMatch(/overflow-wrap:\s*break-word/);
+    expect(cells).not.toMatch(/overflow-wrap:\s*anywhere/);
+    expect(cells).not.toMatch(/word-break:\s*(break-all|break-word)/);
+  });
+
+  it('lets only unbreakable tokens (code, email links) break anywhere', () => {
+    const tokens = rule('.marvin-privacy__table code');
+    expect(tokens).toMatch(/overflow-wrap:\s*anywhere/);
+    expect(rule('.marvin-privacy__table code')).toBe(rule('a[href^="mailto:"]'));
+    expect(css.match(/overflow-wrap:\s*anywhere/g)).toHaveLength(1);
+  });
+
+  it('lets the facts value column shrink so a long address cannot overflow', () => {
+    expect(rule('.marvin-privacy__facts dd')).toMatch(/min-width:\s*0/);
+  });
+
+  it('keeps the policy and its tables inside the container', () => {
+    expect(rule('.marvin-privacy)')).toMatch(/grid-template-columns:\s*minmax\(0,\s*1fr\)/);
+    expect(rule('.marvin-privacy__table-wrap')).toMatch(/overflow-x:\s*auto/);
+    expect(rule('.marvin-privacy__table-wrap')).toMatch(/max-width:\s*100%/);
+    expect(rule('.marvin-privacy__table caption')).toMatch(/display:\s*block/);
   });
 
   it('themes through --marvin-privacy-* and stacks below 600px', () => {

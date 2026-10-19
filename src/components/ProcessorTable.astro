@@ -28,6 +28,7 @@ const rows = (processors ?? []).map((processor) => ({
 ---
 
 {rows.length > 0 && (
+  <div class="marvin-privacy__table-wrap">
   <table class={['marvin-privacy__table', 'marvin-privacy__table--processors', className].filter(Boolean).join(' ')}>
     <thead>
       <tr>
@@ -59,4 +60,5 @@ const rows = (processors ?? []).map((processor) => ({
       ))}
     </tbody>
   </table>
+  </div>
 )}

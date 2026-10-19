@@ -20,6 +20,9 @@
 
 :where(.marvin-privacy) {
   display: grid;
+  /* A bare `1fr`/auto track grows to its widest child's min-content, so one wide table would push
+     the whole policy past the viewport. minmax(0, 1fr) keeps the track at the container's width. */
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--marvin-privacy-gap, 2rem);
 }
 
@@ -40,10 +43,19 @@
 
 :where(.marvin-privacy__facts dd) {
   margin: 0;
+  min-width: 0;
+  overflow-wrap: break-word;
 }
 
 :where(.marvin-privacy__notice, .marvin-privacy__reviewed) {
   color: var(--marvin-privacy-muted, color-mix(in srgb, currentColor 75%, transparent));
+}
+
+:where(.marvin-privacy__table-wrap) {
+  /* Safety net: if a table still cannot fit (many columns in a narrow column, a long URL in a
+     purpose cell) it scrolls inside its own box instead of stretching the page. */
+  max-width: 100%;
+  overflow-x: auto;
 }
 
 :where(.marvin-privacy__table) {
@@ -69,6 +81,15 @@
   padding: var(--marvin-privacy-pad, 0.5rem 0.75rem);
   border-bottom: 1px solid var(--marvin-privacy-border, color-mix(in srgb, currentColor 20%, transparent));
   vertical-align: top;
+  /* Ordinary words wrap at normal break points. `break-word` (unlike `anywhere`) does not shrink a
+     column's min-content width, so a narrow column never splits a word that could sit on its own
+     line. Only an unbreakable token wider than its cell is broken, below. */
+  overflow-wrap: break-word;
+}
+
+/* Long unbreakable tokens (cookie names such as _ga_XXXXXXXX, addresses) may break anywhere, and
+   `anywhere` lets their column shrink so the table stays inside its container. */
+:where(.marvin-privacy__table code, .marvin-privacy__table a[href^="mailto:"], .marvin-privacy__facts a[href^="mailto:"]) {
   overflow-wrap: anywhere;
 }
 
@@ -91,6 +112,12 @@
 @media (max-width: 599px) {
   :where(.marvin-privacy__table, .marvin-privacy__table tbody, .marvin-privacy__table tr, .marvin-privacy__table th, .marvin-privacy__table td) {
     display: block;
+  }
+
+  /* The caption is otherwise sized as a shrink-to-fit table-caption and wraps in a sliver. */
+  :where(.marvin-privacy__table caption) {
+    display: block;
+    width: 100%;
   }
 
   :where(.marvin-privacy__table thead) {

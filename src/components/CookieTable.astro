@@ -70,6 +70,7 @@ const groups = COOKIE_CATEGORIES.filter((name) => !category || name === category
   <noscript><p class="marvin-privacy__notice">{labels.noscript}</p></noscript>
 )}
 {groups.map((group) => (
+  <div class="marvin-privacy__table-wrap">
   <table class={['marvin-privacy__table', 'marvin-privacy__table--cookies', className].filter(Boolean).join(' ')} data-category={group.name}>
     <caption>
       {labels.categories[group.name]}
@@ -94,4 +95,5 @@ const groups = COOKIE_CATEGORIES.filter((name) => !category || name === category
       ))}
     </tbody>
   </table>
+  </div>
 ))}
