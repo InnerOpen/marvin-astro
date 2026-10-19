@@ -1,3 +1,10 @@
+## [2.1.1](https://github.com/InnerOpen/marvin-astro/compare/v2.1.0...v2.1.1) (2026-10-19)
+
+
+### Bug Fixes
+
+* privacy tables wrap at word boundaries; only long tokens break ([27a115c](https://github.com/InnerOpen/marvin-astro/commit/27a115c90c33bf5575d99c0adcc9bc9482b89df9))
+
 # [2.1.0](https://github.com/InnerOpen/marvin-astro/compare/v2.0.0...v2.1.0) (2026-10-19)
 
 
