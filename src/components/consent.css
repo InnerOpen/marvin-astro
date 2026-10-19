@@ -12,6 +12,7 @@
  *   --marvin-consent-shadow   bar shadow (default 0 -4px 24px rgb(0 0 0 / 0.18))
  *   --marvin-consent-z        bar z-index (default 1000)
  *
+ * The buttons share one equal-width column each, so Accept all and Reject all are the same size.
  * Button text uses the background colour, so any bg/accent pair that contrasts keeps the buttons
  * readable. Accept all and Reject all share one rule, so they can never differ in prominence.
  *
@@ -89,8 +90,9 @@
 }
 
 :where(.marvin-consent__actions) {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
   gap: 0.75rem;
 }
 
@@ -179,7 +181,9 @@
 
 @media (max-width: 599px) {
   :where(.marvin-consent__actions) {
-    flex-direction: column;
+    grid-auto-flow: row;
+    grid-auto-columns: auto;
+    flex: 1 1 100%;
   }
 
   :where(.marvin-consent__button) {
