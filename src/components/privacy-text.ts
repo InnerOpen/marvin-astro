@@ -98,3 +98,52 @@ export function formatMaxAge(days: number): string {
   if (days >= 60) return `${Math.round(days / 30)} months`;
   return `${days} ${days === 1 ? 'day' : 'days'}`;
 }
+
+export type ConsentLabels = {
+  title: string;
+  body: string;
+  acceptAll: string;
+  rejectAll: string;
+  customise: string;
+  save: string;
+  /** The "Cookie settings" link (`<CookieSettingsLink>`). */
+  settingsLink: string;
+  /** The link to the policy page, shown when `policyHref` is given. */
+  policyLink: string;
+  dialogTitle: string;
+  dialogBody: string;
+  cookiesList: string;
+  categories: Record<CookieCategory, string>;
+  categoryDescriptions: Record<CookieCategory, string>;
+};
+
+export const DEFAULT_CONSENT_LABELS: ConsentLabels = {
+  title: 'Your privacy choices',
+  body: 'This site would like to use optional cookies and similar storage. Necessary ones are always on. You can accept all, reject all, or choose.',
+  acceptAll: 'Accept all',
+  rejectAll: 'Reject all',
+  customise: 'Customise',
+  save: 'Save choices',
+  settingsLink: 'Cookie settings',
+  policyLink: 'Cookie policy',
+  dialogTitle: 'Cookie settings',
+  dialogBody: 'Choose which optional cookies this site may use. You can change this at any time.',
+  cookiesList: 'Cookies',
+  categories: CATEGORY_LABELS,
+  categoryDescriptions: CATEGORY_DESCRIPTIONS,
+};
+
+export type ConsentLabelOverrides = Partial<Omit<ConsentLabels, 'categories' | 'categoryDescriptions'>> & {
+  categories?: Partial<Record<CookieCategory, string>>;
+  categoryDescriptions?: Partial<Record<CookieCategory, string>>;
+};
+
+/** `labels` merged over the defaults. */
+export function consentLabels(overrides?: ConsentLabelOverrides): ConsentLabels {
+  return {
+    ...DEFAULT_CONSENT_LABELS,
+    ...overrides,
+    categories: { ...CATEGORY_LABELS, ...overrides?.categories },
+    categoryDescriptions: { ...CATEGORY_DESCRIPTIONS, ...overrides?.categoryDescriptions },
+  };
+}

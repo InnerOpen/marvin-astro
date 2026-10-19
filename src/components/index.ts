@@ -25,8 +25,17 @@ export { default as EmbedLoader } from './EmbedLoader.astro';
 export { default as CookieTable } from './CookieTable.astro';
 export { default as ProcessorTable } from './ProcessorTable.astro';
 export { default as PrivacyPolicy } from './PrivacyPolicy.astro';
+export { default as ConsentBanner } from './ConsentBanner.astro';
+export { default as CookieSettingsLink } from './CookieSettingsLink.astro';
 export { marvinIntegration } from './integration.js';
 export { iframeAttributes, installEmbedLoader, isAllowedFrameSrc } from './embed-frame.js';
+export { installConsent } from './consent.js';
+export type {
+  ConsentChoices,
+  ConsentDetail,
+  ConsentRecord,
+  MarvinConsentApi,
+} from './consent.js';
 
 // The framework-agnostic renderer logic, so one import covers a renderer component's needs.
 export * from '../renderers/index.js';

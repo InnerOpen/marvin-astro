@@ -259,6 +259,7 @@ this needs a newer SDK.
 | `FormRenderer` | a public form from a submittable entry type's `formSchema`; unstyled, progressive-enhancement submit |
 | `Embed`, `LinkCard`, `EmbedLoader` | media embeds (above) |
 | `PrivacyPolicy`, `CookieTable`, `ProcessorTable` | privacy & cookie policy rendering ([below](#privacy--cookies)) |
+| `ConsentBanner`, `CookieSettingsLink` | cookie-consent banner and settings link ([below](#consent-banner)) |
 | `EntryRenderer` | picks the renderer for an entry from its entry type's `rendering` |
 | `PageRenderer`, `ArticleRenderer`, `FaqRenderer`, `NavigationRenderer` | unstyled, semantic core renderers with `data-renderer`/`data-role` hooks |
 
@@ -320,6 +321,81 @@ stack below 600px. Every string has a neutral English default; pass `labels={{ .
 `sitePrivacy(raw)` and `consentVersion(privacy)` are exported from the package root. The version is
 a hash of the sorted non-necessary `category|name|provider` triples, so rewording a purpose or
 moving `lastReviewed` never re-asks, while adding, removing or re-categorising a cookie does.
+
+### Consent banner
+
+`<ConsentBanner>` asks only when it has to. It renders **nothing, and ships no script or CSS**, unless
+`site.privacy.bannerRequired` (at least one listed cookie/storage entry is not `necessary`), so a site
+with no optional cookies carries zero banner bytes.
+
+```astro
+---
+// src/layouts/BaseLayout.astro
+import { ConsentBanner, CookieSettingsLink } from '@inneropen/marvin-astro/components';
+const site = await marvin.getSite();
+---
+<html>
+  <body>
+    <ConsentBanner privacy={site.privacy} policyHref="/privacy" />
+    <main>...</main>
+    <footer>
+      <CookieSettingsLink href="/privacy" privacy={site.privacy} />
+    </footer>
+  </body>
+</html>
+```
+
+- **Fail closed.** The markup is `hidden` and the runtime reveals it only when the visitor has no valid
+  choice; without JavaScript there is no dead banner and nothing optional loads. The link in
+  `<CookieSettingsLink>` is a real link to your policy page; with JavaScript it opens the dialog.
+- **Equal choices.** Accept all and Reject all share one class and size; Customise opens a native
+  `<dialog>` with one unticked checkbox per category listed in `site.privacy.cookies`. A non-modal bottom
+  bar, no focus stealing; after a choice focus moves to `<main>`, and the dialog returns it to its opener.
+- **Remembered for 6 months**, refusals too (`maxAgeDays`, default 180), in
+  `localStorage['marvin-consent']`. The choice is bound to `consentVersion(privacy)`: adding, removing or
+  re-categorising an optional cookie asks everyone again; rewording does not. `consent.version` in
+  Marvin's privacy block is a manual re-ask bump. Safari caps script-written storage at 7 days without
+  interaction, so some visitors are asked sooner.
+- **Disclosure.** `marvin-consent` is listed automatically by `<CookieTable>` / `<PrivacyPolicy>`.
+
+Gate optional scripts and markup so they ship inert and run only after consent:
+
+```html
+<script type="text/plain" data-consent="analytics" data-src="https://stats.example/script.js" defer></script>
+<script type="text/plain" data-consent="analytics">window.track?.();</script>
+<template data-consent="marketing"><iframe src="https://ads.example/widget"></iframe></template>
+```
+
+`data-consent` takes one or more categories (`preferences`, `analytics`, `marketing`; all must be
+allowed). Other attributes on the script are copied over, `data-type="module"` restores a module type.
+An unknown category never runs. A site whose `bannerRequired` is false never activates anything, so a
+gated script with no matching entry in Marvin stays inert; a dev build logs a console warning for that.
+Prefer `data-src` over inline code if you use a CSP (inline gated code needs a hash or `unsafe-inline`).
+
+```ts
+window.marvinConsent.get();            // { v, version, choices, at } | null while undecided
+window.marvinConsent.has('analytics'); // 'necessary' is always true
+window.marvinConsent.set({ analytics: true });
+window.marvinConsent.open();           // the Customise dialog
+document.addEventListener('marvin:consent', (e) => e.detail); // { choices, version, initial }
+```
+
+`marvin:consent` fires on load when a valid choice exists (`initial: true`, after the page's module
+scripts have run, so late listeners see it) and on every change. Withdrawing a category deletes the
+site's listed first-party cookies for it (a trailing `*` is a prefix: `_ga*`; the host and its parent
+domains) and reloads the page so nothing keeps running.
+
+**Embeds** stay click-to-load: the click on a facade is the visitor's consent, and they do not make
+`bannerRequired` true. Opt in to auto-loading them after a category is allowed with
+`<ConsentBanner embeds="marketing" ... />` (off by default; needs `<EmbedLoader />`).
+
+Text defaults to neutral English: override per site with `labels={{ title, body, acceptAll, rejectAll,
+customise, save, settingsLink, policyLink, dialogTitle, dialogBody, categories, categoryDescriptions }}`.
+Theme with `--marvin-consent-bg | -fg | -accent | -radius | -font | -shadow | -z` (zero-specificity
+`consent.css`; dark mode follows `prefers-color-scheme`). No consent log is kept anywhere.
+
+Astro note: `<ConsentBanner>` relies on Astro shipping a component's `<script>` and CSS only when it is
+rendered (Astro 5 behaviour). Check your build output on older Astro versions.
 
 ## Migrating from @inneropen/marvin-renderers-core
 
@@ -387,7 +463,7 @@ verification tags. No styling, no site coupling.
 | `@inneropen/marvin-astro` | `createMarvinContent` and every helper below it |
 | `@inneropen/marvin-astro/types` | resolved types only (`ApiSite`, `ApiSeo`, `ApiSiteChrome`, …) |
 | `@inneropen/marvin-astro/astro` | `SeoHead` |
-| `@inneropen/marvin-astro/components` | `FormRenderer`, `Embed`, `LinkCard`, `EmbedLoader`, `EntryRenderer`, the core renderers, registry, `marvinIntegration` |
+| `@inneropen/marvin-astro/components` | `FormRenderer`, `Embed`, `LinkCard`, `EmbedLoader`, `PrivacyPolicy`, `CookieTable`, `ProcessorTable`, `ConsentBanner`, `CookieSettingsLink`, `EntryRenderer`, the core renderers, registry, `marvinIntegration` |
 | `@inneropen/marvin-astro/components/registry` | `getRenderer`, `astroRegistry`, `coreRendererPackage` |
 | `@inneropen/marvin-astro/components/integration` | `marvinIntegration` (for `astro.config.mjs`) |
 | `@inneropen/marvin-astro/components/*` | individual components, `renderers/*.astro`, `embeds.css` |

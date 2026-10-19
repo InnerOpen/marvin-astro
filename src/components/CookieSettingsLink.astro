@@ -1,0 +1,28 @@
+---
+/**
+ * CookieSettingsLink — a "Cookie settings" link for a footer.
+ *
+ * A real link to the cookie/privacy policy page, so it works without JavaScript. With JavaScript
+ * and a rendered <ConsentBanner>, a click opens the Customise dialog instead. Pass `privacy` to
+ * render nothing on a site that has no optional cookies (and so no banner).
+ */
+import type { SitePrivacy } from '../privacy.js';
+import { cookiesNeedConsent } from '../privacy.js';
+import { consentLabels } from './privacy-text.js';
+
+interface Props {
+  /** The cookie/privacy policy page. */
+  href: string;
+  label?: string;
+  /** `site.privacy`; when given and no banner is required, nothing renders. */
+  privacy?: SitePrivacy | null;
+  class?: string;
+}
+
+const { href, label, privacy, class: className } = Astro.props;
+const visible = privacy === undefined || (!!privacy && (privacy.bannerRequired || cookiesNeedConsent(privacy.cookies)));
+---
+
+{visible && (
+  <a class={['marvin-consent-link', className].filter(Boolean).join(' ')} href={href} data-marvin-consent-open>{label ?? consentLabels().settingsLink}</a>
+)}

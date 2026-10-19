@@ -1,0 +1,79 @@
+---
+/**
+ * ConsentBanner — put this once in your layout, first thing in `<body>`.
+ *
+ * Renders nothing (and ships no script or CSS) unless `privacy.bannerRequired`, i.e. at least one
+ * listed cookie or storage entry is not `necessary`. When it does render, the markup is `hidden`
+ * and the consent runtime reveals it only when the visitor has no valid choice, so without
+ * JavaScript there is no dead banner and nothing optional loads.
+ *
+ * Accept all and Reject all are the same size and style; Customise opens a native <dialog> with
+ * one unticked checkbox per category the site lists. The choice is stored in
+ * `localStorage['marvin-consent']` for `maxAgeDays` (default 180, refusals included) and is
+ * bound to a hash of the optional cookie list: change the list and visitors are asked again.
+ *
+ * Gate optional scripts with `<script type="text/plain" data-consent="analytics" data-src="…">`
+ * or `<template data-consent="marketing">`; see `consent.ts`. A gated script on a site whose
+ * `bannerRequired` is false never runs (a dev build warns about it).
+ *
+ * `embeds="marketing"` additionally loads click-to-load embeds once that category is allowed.
+ * Off by default: the click on a facade is already the visitor's consent.
+ */
+import { consentCategories, consentVersion, cookiesNeedConsent } from '../privacy.js';
+import type { SitePrivacy } from '../privacy.js';
+import ConsentBannerView from './ConsentBannerView.astro';
+import { DEFAULT_MAX_AGE_DAYS, consentLabels, type ConsentLabelOverrides } from './privacy-text.js';
+
+interface Props {
+  /** `site.privacy`. */
+  privacy: SitePrivacy | null | undefined;
+  /** Link to the cookie/privacy policy page, shown in the banner and dialog. */
+  policyHref?: string;
+  labels?: ConsentLabelOverrides;
+  /** How long a choice (including a refusal) is remembered. Default 180. */
+  maxAgeDays?: number;
+  /** Also activate click-to-load embeds once this category is allowed. */
+  embeds?: 'preferences' | 'analytics' | 'marketing';
+  /** Dev warning when `data-consent` markup exists but no banner renders. Default: dev builds. */
+  warn?: boolean;
+  class?: string;
+}
+
+const {
+  privacy,
+  policyHref,
+  maxAgeDays = DEFAULT_MAX_AGE_DAYS,
+  embeds,
+  warn = import.meta.env?.DEV === true,
+  class: className,
+} = Astro.props;
+
+const required = !!privacy && (privacy.bannerRequired || cookiesNeedConsent(privacy.cookies));
+const labels = consentLabels(Astro.props.labels);
+const categories = consentCategories(privacy ?? undefined);
+const optional = (privacy?.cookies ?? []).filter((cookie) => cookie.category !== 'necessary');
+const cookieNames = Object.fromEntries(
+  categories.map((category) => [
+    category,
+    optional.filter((cookie) => cookie.category === category).map((cookie) => cookie.name),
+  ])
+);
+---
+
+{required && (
+  <ConsentBannerView
+    version={consentVersion(privacy ?? undefined)}
+    categories={categories}
+    cookieNames={cookieNames}
+    labels={labels}
+    policyHref={policyHref}
+    maxAgeDays={maxAgeDays}
+    embeds={embeds}
+    class={className}
+  />
+)}
+{!required && warn && (
+  <script is:inline>
+    if (document.querySelector('[data-consent]')) console.warn('[marvin-astro] Found data-consent markup, but <ConsentBanner> rendered nothing because site.privacy lists no optional cookie. Those scripts will never run. List the cookie in Marvin, or drop data-consent.');
+  </script>
+)}

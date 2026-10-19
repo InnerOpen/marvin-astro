@@ -1,0 +1,98 @@
+---
+/**
+ * The markup and script of <ConsentBanner>, split out so Astro only ships this component's script
+ * and CSS on pages where the banner is actually rendered. Use <ConsentBanner>.
+ */
+import type { ConsentCategory } from '../privacy.js';
+import type { ConsentLabels } from './privacy-text.js';
+import './consent.css';
+
+interface Props {
+  version: string;
+  categories: ConsentCategory[];
+  cookieNames: Record<string, string[]>;
+  labels: ConsentLabels;
+  policyHref?: string;
+  maxAgeDays: number;
+  embeds?: string;
+  class?: string;
+}
+
+const { version, categories, cookieNames, labels, policyHref, maxAgeDays, embeds, class: className } = Astro.props;
+// A site-relative path is a normal policy link; anything that isn't http(s) once resolved
+// (javascript:, data:, …) is dropped.
+function safeHref(value?: string): string | undefined {
+  if (!value) return undefined;
+  try {
+    return ['http:', 'https:'].includes(new URL(value, 'https://placeholder.invalid').protocol) ? value : undefined;
+  } catch {
+    return undefined;
+  }
+}
+const href = safeHref(policyHref);
+---
+
+<div
+  class={['marvin-consent', className].filter(Boolean).join(' ')}
+  data-marvin-consent-banner
+  data-version={version}
+  data-max-age={String(maxAgeDays)}
+  data-categories={categories.join(' ')}
+  data-cookies={JSON.stringify(cookieNames)}
+  data-embeds={embeds}
+>
+  <section class="marvin-consent__bar" data-marvin-consent-bar aria-labelledby="marvin-consent-title" hidden>
+    <div class="marvin-consent__text">
+      <p class="marvin-consent__title" id="marvin-consent-title">{labels.title}</p>
+      <p class="marvin-consent__body">
+        {labels.body}
+        {href && (<>{' '}<a href={href}>{labels.policyLink}</a></>)}
+      </p>
+    </div>
+    <div class="marvin-consent__actions">
+      <button type="button" class="marvin-consent__button" data-marvin-consent-action="accept">{labels.acceptAll}</button>
+      <button type="button" class="marvin-consent__button" data-marvin-consent-action="reject">{labels.rejectAll}</button>
+      <button type="button" class="marvin-consent__button marvin-consent__button--customise" data-marvin-consent-action="customise">{labels.customise}</button>
+    </div>
+  </section>
+
+  <dialog class="marvin-consent__dialog" aria-labelledby="marvin-consent-dialog-title" aria-describedby="marvin-consent-dialog-body">
+    <h2 class="marvin-consent__title" id="marvin-consent-dialog-title">{labels.dialogTitle}</h2>
+    <p class="marvin-consent__body" id="marvin-consent-dialog-body">
+      {labels.dialogBody}
+      {href && (<>{' '}<a href={href}>{labels.policyLink}</a></>)}
+    </p>
+    <div class="marvin-consent__category">
+      <label class="marvin-consent__label">
+        <input type="checkbox" checked disabled aria-describedby="marvin-consent-desc-necessary" />
+        <span>{labels.categories.necessary}</span>
+      </label>
+      <p class="marvin-consent__description" id="marvin-consent-desc-necessary">{labels.categoryDescriptions.necessary}</p>
+    </div>
+    {categories.map((category) => (
+      <div class="marvin-consent__category">
+        <label class="marvin-consent__label">
+          <input type="checkbox" name={category} data-marvin-consent-category={category} aria-describedby={`marvin-consent-desc-${category}`} />
+          <span>{labels.categories[category]}</span>
+        </label>
+        <p class="marvin-consent__description" id={`marvin-consent-desc-${category}`}>{labels.categoryDescriptions[category]}</p>
+        {cookieNames[category]?.length ? (
+          <p class="marvin-consent__cookies">
+            {labels.cookiesList}: {cookieNames[category]!.map((name, index) => (
+              <>{index > 0 && ', '}<code>{name}</code></>
+            ))}
+          </p>
+        ) : null}
+      </div>
+    ))}
+    <div class="marvin-consent__actions">
+      <button type="button" class="marvin-consent__button" data-marvin-consent-action="save">{labels.save}</button>
+    </div>
+  </dialog>
+</div>
+
+<script>
+  import { installConsent } from './consent';
+
+  installConsent(document);
+</script>
