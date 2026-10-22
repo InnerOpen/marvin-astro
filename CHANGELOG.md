@@ -1,3 +1,10 @@
+## [2.2.1](https://github.com/InnerOpen/marvin-astro/compare/v2.2.0...v2.2.1) (2026-10-22)
+
+
+### Bug Fixes
+
+* requireBackend also fails on a rejected site token ([d8b6cc8](https://github.com/InnerOpen/marvin-astro/commit/d8b6cc891e363eb2ff039089abcbfb05fd8b106c))
+
 # [2.2.0](https://github.com/InnerOpen/marvin-astro/compare/v2.1.1...v2.2.0) (2026-10-22)
 
 
