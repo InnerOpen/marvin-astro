@@ -105,6 +105,7 @@ export function createMarvinContent(options: MarvinContentOptions = {}) {
 export {
   createBackend,
   errorMessage,
+  isAuthFailure,
   isNetworkFailure,
   MarvinUnavailableError,
   type MarvinBackend,

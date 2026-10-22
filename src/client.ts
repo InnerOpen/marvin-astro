@@ -40,6 +40,21 @@ export function isNetworkFailure(error: unknown): boolean {
   );
 }
 
+/**
+ * True for a rejected site token: expired, revoked or without the permission (401/403, or the SDK's MarvinAuthError).
+ * For a build that is the same as Marvin being down — it can't read the content — so `requireBackend` fails on it
+ * too. Without `requireBackend` it stays an ordinary error, as before.
+ */
+export function isAuthFailure(error: unknown): boolean {
+  if (error && typeof error === 'object') {
+    const { name, statusCode, status } = error as { name?: unknown; statusCode?: unknown; status?: unknown };
+    if (name === 'MarvinAuthError') return true;
+    if (statusCode === 401 || statusCode === 403 || status === 401 || status === 403) return true;
+  }
+  const message = errorMessage(error).toLowerCase();
+  return /\b(401|403)\b/.test(message) || message.includes('unauthorized') || message.includes('forbidden');
+}
+
 /** Thrown with `requireBackend` instead of falling back: the build fails and the last good deployment stays live. */
 export class MarvinUnavailableError extends Error {
   constructor(reason: string) {
@@ -99,8 +114,11 @@ export function createBackend(options: MarvinAstroConfig = {}): MarvinBackend {
       latchedAt = null;
     },
     remember(error: unknown) {
+      if (config.requireBackend && isAuthFailure(error)) {
+        throw new MarvinUnavailableError(`Marvin rejected the site token: expired, revoked or missing a permission (${errorMessage(error)})`);
+      }
       if (!isNetworkFailure(error)) return;
-      if (config.requireBackend) throw new MarvinUnavailableError(`Marvin is unreachable (${error instanceof Error ? error.message : String(error)})`);
+      if (config.requireBackend) throw new MarvinUnavailableError(`Marvin is unreachable (${errorMessage(error)})`);
       latchedAt = config.now();
     },
     warn(message: string) {

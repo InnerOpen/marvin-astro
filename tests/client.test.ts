@@ -177,6 +177,18 @@ describe('requireBackend', () => {
     expect(() => backend.hasBackend()).toThrow(MarvinUnavailableError);
   });
 
+  it('throws when Marvin rejects the site token (expired, revoked, missing a permission)', async () => {
+    for (const error of [new Error('401 Unauthorized'), new Error('403 Forbidden'), Object.assign(new Error('nope'), { statusCode: 401 })]) {
+      const { fetcher } = strict(createFakeClient({ throws: error }));
+      await expect(fetcher.collections()).rejects.toThrow(/rejected the site token/);
+    }
+  });
+
+  it('leaves a rejected token an ordinary error when off', async () => {
+    const backend = createBackend({ ...CONNECTION, createClient: () => createFakeClient({ throws: new Error('401 Unauthorized') }).client });
+    await expect(createFetcher(backend).collections()).resolves.toEqual([]);
+  });
+
   it('still lets an application error (a missing entry) through to its usual handling', async () => {
     const { fetcher } = strict(createFakeClient({ throws: new Error('404 Not Found') }));
 

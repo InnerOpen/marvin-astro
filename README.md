@@ -425,7 +425,7 @@ its slot before).
 ## Deploy builds: require the backend
 
 A deploy build should never publish the static fallbacks over a live site. With `requireBackend` on, the first network
-failure (or missing configuration) throws `MarvinUnavailableError` instead of falling back, so the build fails and the
+failure, a rejected site token (401/403: expired, revoked or missing a permission) or missing configuration throws `MarvinUnavailableError` instead of falling back, so the build fails and the
 host (Cloudflare Pages, Netlify…) keeps serving the last good deployment. Application errors (a 404 on one entry) are
 handled as usual.
 
