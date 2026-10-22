@@ -1,3 +1,10 @@
+# [2.2.0](https://github.com/InnerOpen/marvin-astro/compare/v2.1.1...v2.2.0) (2026-10-22)
+
+
+### Features
+
+* requireBackend fails a deploy build instead of publishing the static fallbacks ([b9ef0c4](https://github.com/InnerOpen/marvin-astro/commit/b9ef0c4895dda0b9d53825ba42b06376ad21e628))
+
 ## [2.1.1](https://github.com/InnerOpen/marvin-astro/compare/v2.1.0...v2.1.1) (2026-10-19)
 
 
