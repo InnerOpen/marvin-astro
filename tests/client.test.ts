@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createBackend, isNetworkFailure } from '../src/client.js';
+import { createBackend, isNetworkFailure, MarvinUnavailableError } from '../src/client.js';
 import { createFetcher } from '../src/fetch.js';
 import { createFakeClient, networkError, quietLogger } from './support/fakeClient.js';
 
@@ -155,5 +155,44 @@ describe('fetcher guards', () => {
     expect(await fetcher.entry('anything')).toBeNull();
     expect(await fetcher.site()).toBeNull();
     expect(await fetcher.collectionEntriesFallback(['a', 'b'])).toEqual([]);
+  });
+});
+
+describe('requireBackend', () => {
+  function strict(fake: ReturnType<typeof createFakeClient>, extra: Record<string, unknown> = {}) {
+    const backend = createBackend({ ...CONNECTION, requireBackend: true, createClient: () => fake.client, ...extra });
+    return { backend, fetcher: createFetcher(backend) };
+  }
+
+  it('throws instead of falling back when Marvin is unreachable, so a deploy build fails', async () => {
+    const { backend, fetcher } = strict(createFakeClient({ throws: networkError() }));
+
+    await expect(fetcher.collections()).rejects.toBeInstanceOf(MarvinUnavailableError);
+    expect(backend.isLatched()).toBe(false); // never latched: there is nothing to fall back to
+  });
+
+  it('throws when Marvin is not configured', () => {
+    const backend = createBackend({ env: {}, logger: quietLogger, requireBackend: true });
+
+    expect(() => backend.hasBackend()).toThrow(MarvinUnavailableError);
+  });
+
+  it('still lets an application error (a missing entry) through to its usual handling', async () => {
+    const { fetcher } = strict(createFakeClient({ throws: new Error('404 Not Found') }));
+
+    await expect(fetcher.collections()).resolves.toEqual([]);
+  });
+
+  it('is read from MARVIN_REQUIRE_BACKEND and is off by default', () => {
+    const env = { MARVIN_API_URL: 'http://marvin.test', MARVIN_SITE_CLIENT_TOKEN: 't', MARVIN_WORKSPACE_SLUG: 'w' };
+    expect(createBackend({ logger: quietLogger, env: { ...env, MARVIN_REQUIRE_BACKEND: 'true' } }).config.requireBackend).toBe(true);
+    expect(createBackend({ logger: quietLogger, env }).config.requireBackend).toBe(false);
+  });
+
+  it('falls back as before when off', async () => {
+    const backend = createBackend({ ...CONNECTION, createClient: () => createFakeClient({ throws: networkError() }).client });
+
+    await expect(createFetcher(backend).collections()).resolves.toEqual([]);
+    expect(backend.isLatched()).toBe(true);
   });
 });

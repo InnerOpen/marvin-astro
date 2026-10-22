@@ -40,6 +40,14 @@ export function isNetworkFailure(error: unknown): boolean {
   );
 }
 
+/** Thrown with `requireBackend` instead of falling back: the build fails and the last good deployment stays live. */
+export class MarvinUnavailableError extends Error {
+  constructor(reason: string) {
+    super(`[marvin-astro] ${reason}; requireBackend is on, so this build fails rather than publish the static fallbacks.`);
+    this.name = 'MarvinUnavailableError';
+  }
+}
+
 export type MarvinBackend = {
   readonly config: ResolvedConfig;
   /** True when Marvin is configured AND not currently latched out. */
@@ -76,7 +84,10 @@ export function createBackend(options: MarvinAstroConfig = {}): MarvinBackend {
       envLogged = true;
       config.logger.log('[marvin-astro] env check:', describeConfig(config));
     }
-    if (!config.configured) return false;
+    if (!config.configured) {
+      if (config.requireBackend) throw new MarvinUnavailableError('Marvin is not configured (MARVIN_API_URL, MARVIN_SITE_CLIENT_TOKEN, MARVIN_WORKSPACE_SLUG)');
+      return false;
+    }
     return !isLatched();
   }
 
@@ -88,7 +99,9 @@ export function createBackend(options: MarvinAstroConfig = {}): MarvinBackend {
       latchedAt = null;
     },
     remember(error: unknown) {
-      if (isNetworkFailure(error)) latchedAt = config.now();
+      if (!isNetworkFailure(error)) return;
+      if (config.requireBackend) throw new MarvinUnavailableError(`Marvin is unreachable (${error instanceof Error ? error.message : String(error)})`);
+      latchedAt = config.now();
     },
     warn(message: string) {
       config.logger.warn(`[marvin-astro] ${message}`);

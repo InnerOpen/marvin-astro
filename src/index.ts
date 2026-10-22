@@ -106,6 +106,7 @@ export {
   createBackend,
   errorMessage,
   isNetworkFailure,
+  MarvinUnavailableError,
   type MarvinBackend,
 } from './client.js';
 export {

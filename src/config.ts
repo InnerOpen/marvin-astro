@@ -19,6 +19,7 @@ export const ENV_KEYS = {
   siteClientToken: 'MARVIN_SITE_CLIENT_TOKEN',
   workspaceSlug: 'MARVIN_WORKSPACE_SLUG',
   debug: 'MARVIN_DEBUG',
+  requireBackend: 'MARVIN_REQUIRE_BACKEND',
 } as const;
 
 /** Dev default for the network-failure latch: retry a downed backend after 30s. */
@@ -39,6 +40,12 @@ export type MarvinAstroConfig = {
    * consistently rather than half-succeed with some pages live and some pages static.
    */
   retryAfterMs?: number;
+  /**
+   * Fail instead of falling back when Marvin is unreachable or not configured. For a deploy build: a
+   * build that throws leaves the host's last good deployment live, where a fallback would publish the
+   * static sample content over it. Defaults to `MARVIN_REQUIRE_BACKEND=true`; off for dev.
+   */
+  requireBackend?: boolean;
   /**
    * Maximum entry reads in flight at once while hydrating a collection. Firing every read at
    * once makes a large collection time out on itself; the default of 6 keeps a 280-entry
@@ -68,6 +75,7 @@ export type ResolvedConfig = {
   siteClientToken: string;
   workspaceSlug: string;
   debug: boolean;
+  requireBackend: boolean;
   retryAfterMs: number;
   hydrateConcurrency: number;
   logger: MarvinLogger;
@@ -125,6 +133,7 @@ export function resolveConfig(options: MarvinAstroConfig = {}): ResolvedConfig {
     siteClientToken,
     workspaceSlug,
     debug,
+    requireBackend: options.requireBackend ?? readEnv(ENV_KEYS.requireBackend, env) === 'true',
     retryAfterMs:
       options.retryAfterMs ??
       (isProduction(env) ? Number.POSITIVE_INFINITY : DEFAULT_DEV_RETRY_MS),

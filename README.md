@@ -422,6 +422,19 @@ Behaviour changes: Page/Article now render the body as markdown instead of injec
 `EntryRenderer` renders core entry types without a custom registry (it silently rendered only
 its slot before).
 
+## Deploy builds: require the backend
+
+A deploy build should never publish the static fallbacks over a live site. With `requireBackend` on, the first network
+failure (or missing configuration) throws `MarvinUnavailableError` instead of falling back, so the build fails and the
+host (Cloudflare Pages, Netlify…) keeps serving the last good deployment. Application errors (a 404 on one entry) are
+handled as usual.
+
+```ts
+createMarvinContent({ requireBackend: process.env.CF_PAGES === '1' }); // or MARVIN_REQUIRE_BACKEND=true
+```
+
+Leave it off for local development and previews that should still build offline.
+
 ## The failure latch
 
 A static build asks for content once per path. When the backend is down that means N failed
