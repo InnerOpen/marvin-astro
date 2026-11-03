@@ -1,3 +1,10 @@
+# [2.3.0](https://github.com/InnerOpen/marvin-astro/compare/v2.2.1...v2.3.0) (2026-11-03)
+
+
+### Features
+
+* nav links carry slug and parent; navigationTree() nests them ([67772f2](https://github.com/InnerOpen/marvin-astro/commit/67772f2cf76461d668665ae0dd4c31f1a69f765b))
+
 ## [2.2.1](https://github.com/InnerOpen/marvin-astro/compare/v2.2.0...v2.2.1) (2026-10-22)
 
 
