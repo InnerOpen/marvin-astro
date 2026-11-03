@@ -165,6 +165,7 @@ export {
   createChromeLoader,
   defaultResolveHref,
   metadataLink,
+  navigationTree,
   socialLinkFromKey,
   toNavigationLink,
   type ChromeLoader,

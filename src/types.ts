@@ -127,6 +127,15 @@ export type ApiNavigationLink = {
   external: boolean;
   /** Membership role from the nav collection (e.g. `'primary'`, `'legal'`). Drives grouping. */
   role?: string;
+  /** The nav entry's own slug. What a child's `parent` points at. */
+  slug?: string;
+  /** Slug of the parent nav item (the entry's `parent` field); absent for a top-level item. */
+  parent?: string;
+};
+
+/** A nav link with its children nested under it, as built by `navigationTree()`. */
+export type ApiNavigationNode = ApiNavigationLink & {
+  children: ApiNavigationNode[];
 };
 
 export type ApiSocialLink = ApiNavigationLink & {
