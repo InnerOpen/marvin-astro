@@ -3,12 +3,14 @@ import { createMarvinContent } from '../src/index.js';
 import {
   defaultResolveHref,
   metadataLink,
+  navigationTree,
   socialIconFor,
   socialLinkFromKey,
 } from '../src/chrome.js';
 import { createFakeClient, networkError, quietLogger } from './support/fakeClient.js';
 import { footerNavigationListItems, mainNavigationListItems, marvinSite } from './support/fixtures.js';
 import type { MarvinEntry } from '@inneropen/marvin-sdk';
+import type { ApiNavigationLink } from '../src/types.js';
 import type { ChromeOptions } from '../src/chrome.js';
 import type { FakeClientSetup } from './support/fakeClient.js';
 
@@ -317,5 +319,68 @@ describe('metadataLink', () => {
   it('returns undefined when either half is missing', () => {
     expect(metadataLink({ label: 'Commission' })).toBeUndefined();
     expect(metadataLink(null)).toBeUndefined();
+  });
+});
+
+describe('navigation parents', () => {
+  it('passes each item\'s slug and its parent field through', async () => {
+    const first = mainNavigationListItems[0] as unknown as MarvinEntry;
+    const second = mainNavigationListItems[1] as unknown as MarvinEntry;
+    const { marvin } = chromeWith(
+      {},
+      {
+        entries: {
+          ...NAV_READS,
+          [second.slug]: { ...second, data: { parent: first.slug } } as MarvinEntry,
+        },
+      }
+    );
+    const chrome = await marvin.getSiteChrome();
+
+    expect(chrome.mainNavigation[0]).toMatchObject({ slug: first.slug, parent: undefined });
+    expect(chrome.mainNavigation[1]).toMatchObject({ slug: second.slug, parent: first.slug });
+  });
+});
+
+describe('navigationTree', () => {
+  const link = (slug: string, parent?: string): ApiNavigationLink => ({
+    label: slug,
+    href: `/${slug}`,
+    external: false,
+    slug,
+    parent,
+  });
+  const shape = (nodes: ReturnType<typeof navigationTree>): unknown[] =>
+    nodes.map((n) => (n.children.length ? { [n.slug!]: shape(n.children) } : n.slug));
+
+  it('nests by parent at any depth and keeps order at every level', () => {
+    const tree = navigationTree([
+      link('home'),
+      link('artwork'),
+      link('available', 'artwork'),
+      link('small', 'artwork'),
+      link('canvases', 'small'),
+      link('paper-minis', 'small'),
+      link('vases', 'artwork'),
+      link('about'),
+    ]);
+
+    expect(shape(tree)).toEqual([
+      'home',
+      { artwork: ['available', { small: ['canvases', 'paper-minis'] }, 'vases'] },
+      'about',
+    ]);
+  });
+
+  it('keeps an item whose parent is missing as a root rather than hiding it', () => {
+    expect(shape(navigationTree([link('a', 'ghost'), link('b')]))).toEqual(['a', 'b']);
+  });
+
+  it('drops a cycle instead of looping, and treats self-parent as a root', () => {
+    expect(shape(navigationTree([link('x', 'y'), link('y', 'x'), link('z', 'z')]))).toEqual(['z']);
+  });
+
+  it('is flat for a list with no parents', () => {
+    expect(shape(navigationTree([link('a'), link('b')]))).toEqual(['a', 'b']);
   });
 });

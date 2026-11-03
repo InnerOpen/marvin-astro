@@ -17,6 +17,7 @@ import {
 import type { SiteLoader } from './site.js';
 import type {
   ApiNavigationLink,
+  ApiNavigationNode,
   ApiSite,
   ApiSiteChrome,
   ApiSocialLink,
@@ -96,6 +97,26 @@ export const defaultResolveHref: ResolveHref = (_entry, context) => {
   const owning = context.collections.find((slug) => !context.navCollections.has(slug));
   return owning ? `/${owning}/${context.slug}` : `/${context.slug}`;
 };
+
+/**
+ * Nest a flat, ordered nav list into a tree by each link's `parent` (the parent item's slug).
+ * Order is kept at every level. A link with no parent, or whose parent isn't in the list, is a
+ * root, so a stray `parent` value never hides an item. Depth is unlimited; a cycle can't form a
+ * root and its members are dropped rather than looping.
+ */
+export function navigationTree(links: ApiNavigationLink[]): ApiNavigationNode[] {
+  const nodes = links.map((link) => ({ ...link, children: [] as ApiNavigationNode[] }));
+  const bySlug = new Map<string, ApiNavigationNode>();
+  for (const node of nodes) if (node.slug && !bySlug.has(node.slug)) bySlug.set(node.slug, node);
+
+  const roots: ApiNavigationNode[] = [];
+  for (const node of nodes) {
+    const parent = node.parent ? bySlug.get(node.parent) : undefined;
+    if (parent && parent !== node) parent.children.push(node);
+    else roots.push(node);
+  }
+  return roots;
+}
 
 /** A `{label, href}` object stored loose in site metadata (e.g. `metadata.inquiry`). */
 export function metadataLink(value: unknown): ApiNavigationLink | undefined {
@@ -191,6 +212,8 @@ export function createChromeLoader(
         asString(entry.summary) ?? asString((entry as { description?: unknown }).description),
       external: isExternalHref(href),
       role: collectionRole(entry, collectionSlug),
+      slug: slug || undefined,
+      parent: asString(entryField(entry, 'parent')),
     };
   }
 
