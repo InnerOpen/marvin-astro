@@ -240,6 +240,47 @@ describe('EntryRenderer', () => {
 });
 
 describe('FormRenderer', () => {
+  const oneField = { fields: [{ key: 'email', label: 'Email', type: 'text', required: true }] };
+
+  it('shows the Turnstile widget inside the form and loads its script when the form has a CAPTCHA', async () => {
+    const html = await render(FormRenderer, {
+      action: '/api/forms/inquiry',
+      schema: oneField,
+      captcha: { provider: 'turnstile', siteKey: 'site-key-1' },
+    });
+
+    expect(html).toContain('class="cf-turnstile"');
+    expect(html).toContain('data-sitekey="site-key-1"');
+    expect(html).toContain('data-response-field-name="captchaToken"');
+    expect(html).toContain('https://challenges.cloudflare.com/turnstile/v0/api.js');
+    expect(html.indexOf('cf-turnstile')).toBeLessThan(html.indexOf('</form>'));
+  });
+
+  it('shows the hCaptcha widget for that provider', async () => {
+    const html = await render(FormRenderer, {
+      action: '/api/forms/inquiry',
+      schema: oneField,
+      captcha: { provider: 'hcaptcha', siteKey: 'site-key-2' },
+    });
+
+    expect(html).toContain('class="h-captcha"');
+    expect(html).toContain('https://js.hcaptcha.com/1/api.js');
+  });
+
+  it('shows no widget and loads no script without a CAPTCHA, or for a provider it does not know', async () => {
+    const none = await render(FormRenderer, { action: '/api/forms/inquiry', schema: oneField });
+    const unknown = await render(FormRenderer, {
+      action: '/api/forms/inquiry',
+      schema: oneField,
+      captcha: { provider: 'something-else', siteKey: 'k' },
+    });
+
+    for (const html of [none, unknown]) {
+      expect(html).not.toContain('data-marvin-captcha');
+      expect(html).not.toContain('api.js');
+    }
+  });
+
   it('renders fields from the form schema', async () => {
     const html = await render(FormRenderer, {
       action: '/api/forms/newsletter',
