@@ -1,3 +1,10 @@
+# [2.4.0](https://github.com/InnerOpen/marvin-astro/compare/v2.3.0...v2.4.0) (2026-11-22)
+
+
+### Features
+
+* **forms:** FormRenderer shows a form's CAPTCHA widget and sends its answer as captchaToken ([#2](https://github.com/InnerOpen/marvin-astro/issues/2)) ([3f2bbab](https://github.com/InnerOpen/marvin-astro/commit/3f2bbab3d4748952b9c8176087ebdd8a184d8484))
+
 # [2.3.0](https://github.com/InnerOpen/marvin-astro/compare/v2.2.1...v2.3.0) (2026-11-03)
 
 
