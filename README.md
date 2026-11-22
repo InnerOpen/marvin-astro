@@ -256,7 +256,7 @@ this needs a newer SDK.
 
 | Component | Use |
 |---|---|
-| `FormRenderer` | a public form from a submittable entry type's `formSchema`; unstyled, progressive-enhancement submit |
+| `FormRenderer` | a public form from a submittable entry type's `formSchema`; unstyled, progressive-enhancement submit. Pass the published form's `metadata.captcha` as `captcha` and it shows that form's Turnstile or hCaptcha widget and sends the answer as `captchaToken` (switch the CAPTCHA on for the form in Marvin and give it the site key) |
 | `Embed`, `LinkCard`, `EmbedLoader` | media embeds (above) |
 | `PrivacyPolicy`, `CookieTable`, `ProcessorTable` | privacy & cookie policy rendering ([below](#privacy--cookies)) |
 | `ConsentBanner`, `CookieSettingsLink` | cookie-consent banner and settings link ([below](#consent-banner)) |

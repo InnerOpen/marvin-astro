@@ -4,7 +4,7 @@
  *
  * A submittable entry type IS a form; its `schema_json.fields` ARE the form fields. Fetch the
  * definition from the Marvin publishing API at build time — `GET /publish/{ws}/forms/{slug}`
- * returns `{ formSchema: { fields }, metadata: { successMessage, honeypotField } }` — and pass it
+ * returns `{ formSchema: { fields }, metadata: { successMessage, honeypotField, captcha } }` — and pass it
  * here. The form then renders from the same schema the submission validates against, so a form no
  * longer has to be hand-coded per page or per site.
  *
@@ -36,6 +36,12 @@ export interface Props {
   action: string;
   /** Hidden anti-spam field name; omit to skip the honeypot. */
   honeypotField?: string;
+  /**
+   * The CAPTCHA widget to show (`metadata.captcha` from the publishing API: set when the form's CAPTCHA is on in
+   * Marvin and has a site key). `turnstile` and `hcaptcha` are drawn; the widget's answer is sent as `captchaToken`,
+   * which Marvin checks. Omit, or pass a provider this component doesn't know, and no widget is shown.
+   */
+  captcha?: { provider: string; siteKey: string } | null;
   /** Message shown after a successful (JS) submit. */
   successMessage?: string;
   /** Submit button label. */
@@ -47,12 +53,21 @@ const {
   schema,
   action,
   honeypotField,
+  captcha,
   successMessage = 'Thank you for your submission.',
   submitLabel = 'Send',
   class: className,
 } = Astro.props;
 
 const fields = schema?.fields ?? [];
+
+// The provider's own widget: the element it fills and the script that fills it. Both put their answer in a hidden
+// input inside the form (Turnstile under the name asked for here, hCaptcha under its own, renamed on submit).
+const WIDGETS: Record<string, { className: string; script: string }> = {
+  turnstile: { className: 'cf-turnstile', script: 'https://challenges.cloudflare.com/turnstile/v0/api.js' },
+  hcaptcha: { className: 'h-captcha', script: 'https://js.hcaptcha.com/1/api.js' },
+};
+const widget = captcha?.siteKey ? WIDGETS[captcha.provider] : undefined;
 
 // A text field's input type — inferred from an explicit format hint or the field key.
 function textInputType(f: FormFieldSchema): string {
@@ -142,10 +157,21 @@ function textInputType(f: FormFieldSchema): string {
       </div>
     ))}
 
+    {widget && (
+      <div
+        class={widget.className}
+        data-marvin-captcha={captcha?.provider}
+        data-sitekey={captcha?.siteKey}
+        data-response-field-name="captchaToken"
+      />
+    )}
+
     <button type="submit">{submitLabel}</button>
     <p data-marvin-status role="status" aria-live="polite" hidden></p>
   </form>
 )}
+
+{fields.length > 0 && widget && <script is:inline src={widget.script} async defer></script>}
 
 <script>
   // Progressive enhancement: submit via fetch and show a status message. The native POST is the
@@ -159,6 +185,19 @@ function textInputType(f: FormFieldSchema): string {
       const data: Record<string, unknown> = {};
       for (const [key, value] of new FormData(form).entries()) {
         data[key] = value;
+      }
+      // A CAPTCHA widget's answer goes up as `captchaToken` whichever provider drew it; its own field names stay home.
+      const captcha = form.querySelector<HTMLElement>('[data-marvin-captcha]');
+      if (captcha) {
+        if (!data.captchaToken && data['h-captcha-response']) data.captchaToken = data['h-captcha-response'];
+        for (const name of ['h-captcha-response', 'g-recaptcha-response', 'cf-turnstile-response']) delete data[name];
+        if (!data.captchaToken) {
+          if (status) {
+            status.hidden = false;
+            status.textContent = 'One moment: the spam check has not finished. Please try again.';
+          }
+          return;
+        }
       }
       if (button) button.disabled = true;
       try {
@@ -182,6 +221,18 @@ function textInputType(f: FormFieldSchema): string {
         }
       } finally {
         if (button) button.disabled = false;
+        // An answer is good for one submission: ask the widget for a fresh one, sent or not.
+        if (captcha) {
+          const api = (window as unknown as Record<string, { reset?: (el?: Element) => void } | undefined>)[
+            captcha.dataset.marvinCaptcha === 'hcaptcha' ? 'hcaptcha' : 'turnstile'
+          ];
+          try {
+            if (captcha.dataset.marvinCaptcha === 'hcaptcha') api?.reset?.();
+            else api?.reset?.(captcha);
+          } catch {
+            /* the widget script has not loaded: nothing to reset */
+          }
+        }
       }
     });
   }
