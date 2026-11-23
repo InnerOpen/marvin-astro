@@ -1,3 +1,10 @@
+# [2.5.0](https://github.com/InnerOpen/marvin-astro/compare/v2.4.0...v2.5.0) (2026-11-23)
+
+
+### Features
+
+* **forms:** FormRenderer passes Turnstile's appearance, theme and size to the widget ([#3](https://github.com/InnerOpen/marvin-astro/issues/3)) ([2e887ea](https://github.com/InnerOpen/marvin-astro/commit/2e887eab29e0801c96dc2b93d1954039209a8380))
+
 # [2.4.0](https://github.com/InnerOpen/marvin-astro/compare/v2.3.0...v2.4.0) (2026-11-22)
 
 
