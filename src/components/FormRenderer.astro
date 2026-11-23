@@ -29,6 +29,20 @@ export interface FormFieldSchema {
   format?: string; // 'email' | 'tel' | 'url' — hints the input type
 }
 
+/**
+ * The CAPTCHA widget to show. `appearance`, `theme` and `size` are Turnstile's own options, passed through as it names them
+ * (the widget is drawn inside the provider's iframe, so these are the only looks it offers): `appearance: 'interaction-only'`
+ * shows the box only to a visitor who has to do something (most never see it); `theme` is `auto`, `light` or `dark`; `size` is
+ * `normal`, `flexible` (fills the form's width) or `compact`. They apply to Turnstile only.
+ */
+export interface CaptchaWidget {
+  provider: string;
+  siteKey: string;
+  appearance?: 'always' | 'execute' | 'interaction-only';
+  theme?: 'auto' | 'light' | 'dark';
+  size?: 'normal' | 'flexible' | 'compact';
+}
+
 export interface Props {
   /** The entry type's field schema (`formSchema` from the publishing API). */
   schema: { fields: FormFieldSchema[] } | null | undefined;
@@ -41,7 +55,7 @@ export interface Props {
    * Marvin and has a site key). `turnstile` and `hcaptcha` are drawn; the widget's answer is sent as `captchaToken`,
    * which Marvin checks. Omit, or pass a provider this component doesn't know, and no widget is shown.
    */
-  captcha?: { provider: string; siteKey: string } | null;
+  captcha?: CaptchaWidget | null;
   /** Message shown after a successful (JS) submit. */
   successMessage?: string;
   /** Submit button label. */
@@ -163,6 +177,9 @@ function textInputType(f: FormFieldSchema): string {
         data-marvin-captcha={captcha?.provider}
         data-sitekey={captcha?.siteKey}
         data-response-field-name="captchaToken"
+        data-appearance={captcha?.provider === 'turnstile' ? captcha.appearance : undefined}
+        data-theme={captcha?.provider === 'turnstile' ? captcha.theme : undefined}
+        data-size={captcha?.provider === 'turnstile' ? captcha.size : undefined}
       />
     )}
 

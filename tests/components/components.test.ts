@@ -256,6 +256,31 @@ describe('FormRenderer', () => {
     expect(html.indexOf('cf-turnstile')).toBeLessThan(html.indexOf('</form>'));
   });
 
+  it("passes Turnstile's appearance, theme and size through, and leaves them out when not asked for", async () => {
+    const asked = await render(FormRenderer, {
+      action: '/api/forms/inquiry',
+      schema: oneField,
+      captcha: { provider: 'turnstile', siteKey: 'k', appearance: 'interaction-only', theme: 'light', size: 'flexible' },
+    });
+    const plain = await render(FormRenderer, { action: '/api/forms/inquiry', schema: oneField, captcha: { provider: 'turnstile', siteKey: 'k' } });
+
+    expect(asked).toContain('data-appearance="interaction-only"');
+    expect(asked).toContain('data-theme="light"');
+    expect(asked).toContain('data-size="flexible"');
+    for (const name of ['data-appearance', 'data-theme', 'data-size']) expect(plain).not.toContain(name);
+  });
+
+  it('does not hand Turnstile-only options to another provider', async () => {
+    const html = await render(FormRenderer, {
+      action: '/api/forms/inquiry',
+      schema: oneField,
+      captcha: { provider: 'hcaptcha', siteKey: 'k', appearance: 'interaction-only', size: 'flexible' },
+    });
+
+    expect(html).toContain('class="h-captcha"');
+    for (const name of ['data-appearance', 'data-size']) expect(html).not.toContain(name);
+  });
+
   it('shows the hCaptcha widget for that provider', async () => {
     const html = await render(FormRenderer, {
       action: '/api/forms/inquiry',
